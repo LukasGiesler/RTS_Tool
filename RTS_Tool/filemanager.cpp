@@ -1,5 +1,5 @@
 #include "filemanager.h"
-#include "qfile"
+#include "qfile.h"
 #include "qdebug.h"
 #include "datamanager.h"
 
