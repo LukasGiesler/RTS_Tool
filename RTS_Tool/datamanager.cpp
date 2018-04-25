@@ -52,8 +52,8 @@ void DataManager::ProcessRawData()
     }
     laylandCalculationString.append(" = " + QString::number(utilizationU));
 
-    float utilizationBound = processedDataList.size()*(std::pow(2.f,1.f/processedDataList.size())-1.f);
-    qDebug() << "Utilization Bound: " << utilizationBound;
+    utilizationBound = processedDataList.size()*(std::pow(2.f,1.f/processedDataList.size())-1.f);
+
     // Bounds check
-    isSchedulable = (utilizationU <= utilizationBound);
+    //isSchedulable = (utilizationU <= utilizationBound);
 }

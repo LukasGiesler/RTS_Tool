@@ -67,6 +67,7 @@ public:
 
     bool isSchedulable = false;
     float utilizationU;
+    float utilizationBound;
     QString laylandCalculationString;
 
     static bool dataComparison(const ProcessedDataRow &s1, const ProcessedDataRow &s2)

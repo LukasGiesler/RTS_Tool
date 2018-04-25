@@ -46,10 +46,12 @@ void MainWindow::on_pushButton_clicked()
     DataManager dataManager;
     dataManager.ProcessRawData();
     ui->utilizationUText->setPlainText(QString::number(dataManager.utilizationU));
+    ui->utilizationBound->setPlainText(QString::number(dataManager.utilizationBound));
     ui->laylandCalculationText->setPlainText(dataManager.laylandCalculationString);
-    if(dataManager.isSchedulable)
+
+    if(dataManager.utilizationU <= dataManager.utilizationBound)
     {
-        ui->schedulabilityStatusText->setPlainText("Passed.");
+        ui->schedulabilityStatusText->setPlainText("Success.");
         ui->schedulabilityStatusText->setStyleSheet("color:green;");
 
         // Visualize data
@@ -59,9 +61,20 @@ void MainWindow::on_pushButton_clicked()
         ui->timelineGraphAsStringText->setPlainText(dataVisualizer.timelineGraphAsString);
         //DrawTimelineGraph();
     }
+    else if((dataManager.utilizationBound < dataManager.utilizationU) && (dataManager.utilizationU < 1))
+    {
+        ui->schedulabilityStatusText->setPlainText("Inconclusive.");
+        ui->schedulabilityStatusText->setStyleSheet("color:DarkOrange;");
+
+        // Visualize data
+        DataVisualizer dataVisualizer;
+        dataVisualizer.VisualizeData();
+        ui->timelineStringText->setPlainText(dataVisualizer.timelineString);
+        ui->timelineGraphAsStringText->setPlainText(dataVisualizer.timelineGraphAsString);
+    }
     else
     {
-        ui->schedulabilityStatusText->setPlainText("Failed.");
+        ui->schedulabilityStatusText->setPlainText("Overload.");
         ui->schedulabilityStatusText->setStyleSheet("color:red;");
     }
 

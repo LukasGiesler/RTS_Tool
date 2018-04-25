@@ -80,13 +80,12 @@ void DataVisualizer::VisualizeData()
                 }
                 else
                 {//Doesn't fit
-                    break; // this might prevent tasks with small C, but high T from being scheduled
+                    break;
                 }
             }
         }
         currentCycleC = 0;
         timelineString.append(" ");
-        //globalT += minorCycleLength;
     }
 
     // Debug Graph End
@@ -107,7 +106,11 @@ void DataVisualizer::VisualizeData()
         }
         else
         {
-            if(i>=10 && (i+1)%5 == 0)
+            if(i>=100 && (i+2)%5 == 0)
+            {
+                continue;
+            }
+            else if(i>=10 && (i+1)%5 == 0)
             {
                 continue;
             }
