@@ -23,6 +23,8 @@ private:
 
     void SetupRawDataTable();
     void SetupProcessedDataTable();
+    void Cleanup();
+    void DrawTimelineGraph();
 };
 
 #endif // MAINWINDOW_H

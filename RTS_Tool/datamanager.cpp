@@ -24,7 +24,7 @@ void DataManager::ProcessRawData()
     // Create processed data list
     for(int i=0;i<rawDataList.size();i++)
     {
-        ProcessedDataRow newProcessedDataRow(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, 0);
+        ProcessedDataRow newProcessedDataRow(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, 0, 0);
         processedDataList.append(newProcessedDataRow);
     }
 
@@ -38,14 +38,20 @@ void DataManager::ProcessRawData()
     }
 
     // Calculate Lui-Layland Utilization U for the task set
+    laylandCalculationString.clear();
+    laylandCalculationString.append("U=");
     utilizationU = 0;
     for(int i=0;i<processedDataList.size();i++)
     {
-        utilizationU += ((float)processedDataList.at(i).computationTimeC/(float)processedDataList.at(i).periodT);
+        float currentUtilizationU = ((float)processedDataList.at(i).computationTimeC/(float)processedDataList.at(i).periodT);
+        utilizationU += currentUtilizationU;
+        processedDataList[i].utilizationU = currentUtilizationU;
+        if(i>0) laylandCalculationString.append(" + ");
+        laylandCalculationString.append(QString::number(processedDataList.at(i).computationTimeC) + "/" + QString::number(processedDataList.at(i).periodT));
     }
-    qDebug() << utilizationU;
+    laylandCalculationString.append(" = " + QString::number(utilizationU));
+
     float otherNumber = processedDataList.size()*(std::powf(2.f,(1.f/processedDataList.size()-1.f)));
-    qDebug() << otherNumber;
 
     // Bounds check
     isSchedulable = (utilizationU <= otherNumber);

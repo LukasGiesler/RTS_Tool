@@ -24,13 +24,27 @@ struct ProcessedDataRow
     int periodT;
     int computationTimeC;
     int rmsPriority;
+    float utilizationU;
+    float availableT;
 
-    ProcessedDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inRmsPriority)
+    ProcessedDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inRmsPriority, float inUtilizationU)
     {
         processName = inProcessName;
         periodT = inPeriodT;
         computationTimeC = inComputationTimeC;
         rmsPriority = inRmsPriority;
+        utilizationU = inUtilizationU;
+        availableT = 0;
+    }
+
+    ProcessedDataRow(const ProcessedDataRow& inProcessedDataRow)
+    {
+        processName = inProcessedDataRow.processName;
+        periodT = inProcessedDataRow.periodT;
+        computationTimeC = inProcessedDataRow.computationTimeC;
+        rmsPriority = inProcessedDataRow.rmsPriority;
+        utilizationU = inProcessedDataRow.utilizationU;
+        availableT = inProcessedDataRow.availableT;
     }
 };
 
@@ -53,6 +67,7 @@ public:
 
     bool isSchedulable = false;
     float utilizationU;
+    QString laylandCalculationString;
 
     static bool dataComparison(const ProcessedDataRow &s1, const ProcessedDataRow &s2)
     {

@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT += charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,12 +28,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     filemanager.cpp \
-    datamanager.cpp
+    datamanager.cpp \
+    datavisualizer.cpp
 
 HEADERS += \
         mainwindow.h \
     filemanager.h \
-    datamanager.h
+    datamanager.h \
+    datavisualizer.h
 
 FORMS += \
         mainwindow.ui
