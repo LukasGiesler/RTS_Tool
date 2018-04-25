@@ -1,6 +1,7 @@
 #include "datamanager.h"
 #include "qstringlist.h"
 #include "qdebug.h"
+#include <cmath>
 
 QList<RawDataRow> DataManager::rawDataList;
 QList<ProcessedDataRow> DataManager::processedDataList;
@@ -51,8 +52,8 @@ void DataManager::ProcessRawData()
     }
     laylandCalculationString.append(" = " + QString::number(utilizationU));
 
-    float otherNumber = processedDataList.size()*(std::powf(2.f,(1.f/processedDataList.size()-1.f)));
-
+    float utilizationBound = processedDataList.size()*(std::pow(2.f,1.f/processedDataList.size())-1.f);
+    qDebug() << "Utilization Bound: " << utilizationBound;
     // Bounds check
-    isSchedulable = (utilizationU <= otherNumber);
+    isSchedulable = (utilizationU <= utilizationBound);
 }
