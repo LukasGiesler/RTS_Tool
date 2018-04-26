@@ -24,6 +24,7 @@ private:
 
     void SetupRawDataTable();
     void SetupProcessedDataTable();
+    void SetupDmsDataTable();
     void SetupSchedulabilityTest(DataManager& dataManager);
     void SetupDataVisualization();
     void Cleanup();

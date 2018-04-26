@@ -21,7 +21,7 @@
        <bool>false</bool>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="accessibleName">
@@ -178,7 +178,7 @@ background-color: rgba(255, 255, 255, 0);
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
-        <string>Processed task set</string>
+        <string>RMS task set</string>
        </attribute>
        <widget class="QTableWidget" name="processedTaskSetTable">
         <property name="enabled">
@@ -427,6 +427,82 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
         </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>DMS task set</string>
+       </attribute>
+       <widget class="QTableWidget" name="dmsTaskSetTable">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>611</width>
+          <height>311</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>800</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>120</number>
+        </attribute>
+        <attribute name="horizontalHeaderHighlightSections">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>39</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>30</number>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>23</number>
+        </attribute>
+        <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Process name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Period T</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Computation Time T</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Deadline D</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>RMS Priority</string>
+         </property>
+        </column>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_6">

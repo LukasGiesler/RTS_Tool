@@ -67,7 +67,7 @@ void DataManager::ProcessDmsData()
     // Create processed data list
     for(int i=0;i<rawDataList.size();i++)
     {
-        dmsDataRow newDmsDataRow(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, 0, 0);
+        dmsDataRow newDmsDataRow(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, rawDataList[i].deadlineD, 0, 0);
         dmsDataList.append(newDmsDataRow);
     }
 
@@ -81,5 +81,5 @@ void DataManager::ProcessDmsData()
     }
 
     // Test schedulability
-    LuiLaylandTest();
+    //LuiLaylandTest();
 }

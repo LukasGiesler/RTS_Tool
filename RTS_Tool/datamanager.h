@@ -28,6 +28,7 @@ struct ProcessedDataRow
     int rmsPriority;
     float utilizationU;
     float availableT;
+    float remainingC;
 
     ProcessedDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inRmsPriority, float inUtilizationU)
     {
@@ -37,6 +38,7 @@ struct ProcessedDataRow
         rmsPriority = inRmsPriority;
         utilizationU = inUtilizationU;
         availableT = 0;
+        remainingC = computationTimeC;
     }
 
     ProcessedDataRow(const ProcessedDataRow& inProcessedDataRow)
@@ -47,6 +49,7 @@ struct ProcessedDataRow
         rmsPriority = inProcessedDataRow.rmsPriority;
         utilizationU = inProcessedDataRow.utilizationU;
         availableT = inProcessedDataRow.availableT;
+        remainingC = computationTimeC;
     }
 };
 
@@ -55,18 +58,22 @@ struct dmsDataRow
     QString processName;
     int periodT;
     int computationTimeC;
+    int deadlineD;
     int dmsPriority;
     float utilizationU;
     float availableT;
+    float remainingC;
 
-    dmsDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inDmsPriority, float inUtilizationU)
+    dmsDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inDeadlineD, int inDmsPriority, float inUtilizationU)
     {
         processName = inProcessName;
         periodT = inPeriodT;
         computationTimeC = inComputationTimeC;
+        deadlineD = inDeadlineD;
         dmsPriority = inDmsPriority;
         utilizationU = inUtilizationU;
         availableT = 0;
+        remainingC = computationTimeC;
     }
 
     dmsDataRow(const dmsDataRow& inDmsDataRow)
@@ -74,9 +81,11 @@ struct dmsDataRow
         processName = inDmsDataRow.processName;
         periodT = inDmsDataRow.periodT;
         computationTimeC = inDmsDataRow.computationTimeC;
+        deadlineD = inDmsDataRow.deadlineD;
         dmsPriority = inDmsDataRow.dmsPriority;
         utilizationU = inDmsDataRow.utilizationU;
         availableT = inDmsDataRow.availableT;
+        remainingC = computationTimeC;
     }
 };
 
@@ -115,7 +124,7 @@ public:
 
     static bool dmsComparison(const dmsDataRow &s1, const dmsDataRow &s2)
     {
-        return s1.periodT < s2.periodT;
+        return s1.deadlineD < s2.deadlineD;
     }
 
 };

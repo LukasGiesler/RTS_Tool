@@ -7,6 +7,7 @@
 #include "datavisualizer.h"
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
+#include "qdebug.h"
 
 using namespace QtCharts;
 
@@ -51,6 +52,10 @@ void MainWindow::on_pushButton_clicked()
 
     // Setup Schedulability Test
     SetupSchedulabilityTest(dataManager);
+
+    // Setup dms task set
+    dataManager.ProcessDmsData();
+    SetupDmsDataTable();
 }
 
 void MainWindow::SetupRawDataTable()
@@ -91,6 +96,27 @@ void MainWindow::SetupProcessedDataTable()
     ui->tabWidget->setCurrentIndex(1);
 }
 
+void MainWindow::SetupDmsDataTable()
+{
+    ui->dmsTaskSetTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Process Name"), QTableWidgetItem::Type));
+    ui->dmsTaskSetTable->setHorizontalHeaderItem(1, new QTableWidgetItem(QString("Period T"), QTableWidgetItem::Type));
+    ui->dmsTaskSetTable->setHorizontalHeaderItem(2, new QTableWidgetItem(QString("Computation Time C"), QTableWidgetItem::Type));
+    ui->dmsTaskSetTable->setHorizontalHeaderItem(3, new QTableWidgetItem(QString("Deadline D"), QTableWidgetItem::Type));
+    ui->dmsTaskSetTable->setHorizontalHeaderItem(4, new QTableWidgetItem(QString("DMS Priority"), QTableWidgetItem::Type));
+
+    for(int i=0;i<DataManager::rawDataList.size();i++)
+    {
+        qDebug() << DataManager::dmsDataList.size();
+        ui->dmsTaskSetTable->insertRow(ui->dmsTaskSetTable->rowCount());
+        ui->dmsTaskSetTable->setItem(i, 0, new QTableWidgetItem(DataManager::dmsDataList.at(i).processName));
+        ui->dmsTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).periodT)));
+        ui->dmsTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).computationTimeC)));
+        ui->dmsTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).deadlineD)));
+        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).dmsPriority)));
+    }
+
+}
+
 void MainWindow::SetupSchedulabilityTest(DataManager& dataManager)
 {
     ui->utilizationUText->setPlainText(QString::number(dataManager.utilizationU));
@@ -103,7 +129,7 @@ void MainWindow::SetupSchedulabilityTest(DataManager& dataManager)
         ui->schedulabilityStatusText->setStyleSheet("color:green;");
         SetupDataVisualization();
     }
-    else if((dataManager.utilizationBound < dataManager.utilizationU) && (dataManager.utilizationU < 1))
+    else if((dataManager.utilizationBound < dataManager.utilizationU) && (dataManager.utilizationU <= 1))
     {
         ui->schedulabilityStatusText->setPlainText("Inconclusive.");
         ui->schedulabilityStatusText->setStyleSheet("color:DarkOrange;");
@@ -138,6 +164,8 @@ void MainWindow::Cleanup()
     ui->timelineGraphAsStringText->setPlainText("");
     ui->rmsTimelineStringText->setPlainText("");
     ui->dmsTimelineStringText->setPlainText("");
+    ui->dmsTaskSetTable->clear();
+    ui->dmsTaskSetTable->setRowCount(0);
 }
 
 void MainWindow::DrawTimelineGraph()

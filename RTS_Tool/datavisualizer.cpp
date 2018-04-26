@@ -24,7 +24,6 @@ int DataVisualizer::CalculateLCM()
         outLCM = (((DataManager::processedDataList.at(i).periodT * outLCM))/(CalculateGCD(DataManager::processedDataList.at(i).periodT, outLCM)));
 
     }
-    qDebug() << QString::number(outLCM);
     return outLCM;
 }
 
@@ -75,26 +74,26 @@ void DataVisualizer::ScheduleRMS()
                     rmsTimelineString.append(newProcessedDataRow.processName);
                     DataManager::processedDataList.removeAt(i);
                     DataManager::processedDataList.insert(i, newProcessedDataRow);
-
-                    // RMS Timeline Graph, draw process status
-                    for(int k=0; k<timelineGraphStrings.size(); k++)
-                    {
-                        for(int l=0; l<DataManager::processedDataList.at(i).computationTimeC; l++)
-                        {
-                            if(k == i)
-                            {
-                                timelineGraphStrings[k].append("-");
-                            }
-                            else
-                            {
-                                timelineGraphStrings[k].append(".");
-                            }
-                        }
-                    }
                 }
                 else
                 {//Doesn't fit
+
                     break;
+                }
+                // RMS Timeline Graph, draw process status
+                for(int k=0; k<timelineGraphStrings.size(); k++)
+                {
+                    for(int l=0; l<DataManager::processedDataList.at(i).computationTimeC; l++)
+                    {
+                        if(k == i)
+                        {
+                            timelineGraphStrings[k].append("-");
+                        }
+                        else
+                        {
+                            timelineGraphStrings[k].append(".");
+                        }
+                    }
                 }
             }
         }
