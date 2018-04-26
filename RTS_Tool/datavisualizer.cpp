@@ -39,7 +39,6 @@ void DataVisualizer::VisualizeData()
             // Check if current task is available (computation finished)
             if(DataManager::processedDataList.at(i).availableT <= globalT)
             {
-                qDebug() << "If: " << (currentCycleC + DataManager::processedDataList.at(i).computationTimeC);
                 // Check if the current task fits into the current minor cycle
                 if((currentCycleC + DataManager::processedDataList.at(i).computationTimeC) <= minorCycleLength)
                 {//Fit
@@ -66,8 +65,6 @@ void DataVisualizer::VisualizeData()
                             }
                         }
                     }
-
-                    //qDebug() << DataManager::processedDataList.at(i).processName << " executes for " << DataManager::processedDataList.at(i).computationTimeC << " and will finish at t = " << DataManager::processedDataList.at(i).availableT;
                 }
                 else
                 {//Doesn't fit
@@ -89,12 +86,14 @@ void DataVisualizer::VisualizeData()
         rmsTimelineString.append(" ");
     }
 
-    // Debug Graph End
+    // RMS Timeline Graph, draw newlines
     for(int i=0; i<timelineGraphStrings.size(); i++)
     {
         timelineGraphStrings[i].append("\n");
         timelineGraphAsString.append(timelineGraphStrings.at(i));
     }
+
+    // RMS Timeline Graph, draw X axis
     for(int i=0; i<timelineGraphStrings[0].size(); i++)
     {
         if(i > majorCycleLength)
@@ -127,22 +126,6 @@ void DataVisualizer::VisualizeData()
             timelineGraphAsString.append(".");
         }
     }
-
-    /* String Concept
-     * abcabdeabcabd
-     *
-     */
-
-    /* Chart Concept
-     *
-     *  ^
-     * a| -   -   -  -
-     * b|  -   -   -  -
-     * c|   -       -
-     * d|       -      -
-     * e|        -
-     * *0----5----10----15->
-     */
 }
 
 
@@ -159,6 +142,7 @@ int DataVisualizer::CalculateLCM()
     return outLCM;
 }
 
+// Calculates Greatest Common Divider
 int DataVisualizer::CalculateGCD(int a, int b)
 {
     if (b == 0)

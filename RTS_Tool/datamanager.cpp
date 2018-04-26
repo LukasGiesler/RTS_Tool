@@ -38,6 +38,12 @@ void DataManager::ProcessRawData()
         processedDataList[i].rmsPriority = processedDataList.size() - i;
     }
 
+    // Test schedulability
+    LuiLaylandTest();
+}
+
+void DataManager::LuiLaylandTest()
+{
     // Calculate Lui-Layland Utilization U for the task set
     laylandCalculationString.clear();
     laylandCalculationString.append("U=");
@@ -53,7 +59,4 @@ void DataManager::ProcessRawData()
     laylandCalculationString.append(" = " + QString::number(utilizationU));
 
     utilizationBound = processedDataList.size()*(std::pow(2.f,1.f/processedDataList.size())-1.f);
-
-    // Bounds check
-    //isSchedulable = (utilizationU <= utilizationBound);
 }

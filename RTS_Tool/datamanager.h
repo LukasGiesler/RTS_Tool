@@ -62,6 +62,8 @@ public:
     // Resets the data manager
     void Cleanup();
 
+    void LuiLaylandTest();
+
     static QList<RawDataRow> rawDataList;
     static QList<ProcessedDataRow> processedDataList;
 
