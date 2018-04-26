@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "datamanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +24,8 @@ private:
 
     void SetupRawDataTable();
     void SetupProcessedDataTable();
+    void SetupSchedulabilityTest(DataManager& dataManager);
+    void SetupDataVisualization();
     void Cleanup();
     void DrawTimelineGraph();
 };

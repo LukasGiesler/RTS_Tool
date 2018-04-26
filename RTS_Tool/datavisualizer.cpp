@@ -10,28 +10,16 @@ DataVisualizer::DataVisualizer()
 
 void DataVisualizer::VisualizeData()
 {
-
-    CalculateLCM();
     // Cleanup
-    timelineString.clear();
+    rmsTimelineString.clear();
 
-    /* RMS Scheduling Concept
-     * 1. Lowest Common Multiple of period T of sorted task list to determine Major Cycle Length
-     * 2. Minor Cycle Length is the smallest period T
-     * 3. Each Minor Cycle Loop
-     * 3.1 Check Task with highest priority (lowest period T)
-     * 3.2 If task is currently not computing, start the task.
-     * 3.3 If it is computing, go to next task.
-     */
-
-    // todo: Create Timeline string
     int minorCycleLength = DataManager::processedDataList.at(0).periodT;
     int majorCycleLength = CalculateLCM();
     int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
     int globalT = 0;
     int currentCycleC = 0;
 
-    // Debug Graph
+    // RMS Timeline Graph, draw Y Axis
     QList<QString> timelineGraphStrings;
     for(int i=0; i<DataManager::processedDataList.size(); i++)
     {
@@ -43,6 +31,8 @@ void DataVisualizer::VisualizeData()
     {
         // At the start of each minor cycle, the current t is known
         globalT = j*minorCycleLength;
+        currentCycleC = 0;
+
         // Schedule a minor cycle
         for(int i=0; i<DataManager::processedDataList.size(); i++)
         {
@@ -57,11 +47,11 @@ void DataVisualizer::VisualizeData()
                     currentCycleC += DataManager::processedDataList.at(i).computationTimeC;
                     newProcessedDataRow.availableT = globalT + DataManager::processedDataList.at(i).periodT;// todo: Consider what happens if minor cycle length is exceeded here
                     globalT += DataManager::processedDataList.at(i).computationTimeC;
-                    timelineString.append(newProcessedDataRow.processName);
+                    rmsTimelineString.append(newProcessedDataRow.processName);
                     DataManager::processedDataList.removeAt(i);
                     DataManager::processedDataList.insert(i, newProcessedDataRow);
 
-                    // Debug Graph
+                    // RMS Timeline Graph, draw process status
                     for(int k=0; k<timelineGraphStrings.size(); k++)
                     {
                         for(int l=0; l<DataManager::processedDataList.at(i).computationTimeC; l++)
@@ -85,22 +75,18 @@ void DataVisualizer::VisualizeData()
                 }
             }
         }
-        qDebug() << minorCycleLength-currentCycleC;
-        // Debug Graph
+
+        // RMS Timeline Graph, draw gap at end of minor cycle
         for(int k=0; k<timelineGraphStrings.size(); k++)
         {
             for(int l=0; l<minorCycleLength-currentCycleC; l++)
             {
                 timelineGraphStrings[k].append(".");
             }
-        }
-        currentCycleC = 0;
-        timelineString.append(" ");
-
-        for(int k=0; k<timelineGraphStrings.size(); k++)
-        {
             timelineGraphStrings[k].append(" ");
         }
+
+        rmsTimelineString.append(" ");
     }
 
     // Debug Graph End

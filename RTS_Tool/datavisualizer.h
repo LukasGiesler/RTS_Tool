@@ -12,7 +12,7 @@ public:
     int CalculateGCD(int a, int b);
     int CalculateLCM();
 
-    QString timelineString;
+    QString rmsTimelineString;
     QString timelineGraphAsString;
 
     QString dmsTimelineString;

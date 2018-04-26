@@ -45,41 +45,12 @@ void MainWindow::on_pushButton_clicked()
     // Process task set
     DataManager dataManager;
     dataManager.ProcessRawData();
-    ui->utilizationUText->setPlainText(QString::number(dataManager.utilizationU));
-    ui->utilizationBound->setPlainText(QString::number(dataManager.utilizationBound));
-    ui->laylandCalculationText->setPlainText(dataManager.laylandCalculationString);
-
-    if(dataManager.utilizationU <= dataManager.utilizationBound)
-    {
-        ui->schedulabilityStatusText->setPlainText("Success.");
-        ui->schedulabilityStatusText->setStyleSheet("color:green;");
-
-        // Visualize data
-        DataVisualizer dataVisualizer;
-        dataVisualizer.VisualizeData();
-        ui->timelineStringText->setPlainText(dataVisualizer.timelineString);
-        ui->timelineGraphAsStringText->setPlainText(dataVisualizer.timelineGraphAsString);
-        //DrawTimelineGraph();
-    }
-    else if((dataManager.utilizationBound < dataManager.utilizationU) && (dataManager.utilizationU < 1))
-    {
-        ui->schedulabilityStatusText->setPlainText("Inconclusive.");
-        ui->schedulabilityStatusText->setStyleSheet("color:DarkOrange;");
-
-        // Visualize data
-        DataVisualizer dataVisualizer;
-        dataVisualizer.VisualizeData();
-        ui->timelineStringText->setPlainText(dataVisualizer.timelineString);
-        ui->timelineGraphAsStringText->setPlainText(dataVisualizer.timelineGraphAsString);
-    }
-    else
-    {
-        ui->schedulabilityStatusText->setPlainText("Overload.");
-        ui->schedulabilityStatusText->setStyleSheet("color:red;");
-    }
 
     // Setup processed task set table
     SetupProcessedDataTable();
+
+    // Setup Schedulability Test
+    SetupSchedulabilityTest(dataManager);
 }
 
 void MainWindow::SetupRawDataTable()
@@ -118,6 +89,41 @@ void MainWindow::SetupProcessedDataTable()
     ui->tabWidget->setCurrentIndex(1);
 }
 
+void MainWindow::SetupSchedulabilityTest(DataManager& dataManager)
+{
+    ui->utilizationUText->setPlainText(QString::number(dataManager.utilizationU));
+    ui->utilizationBound->setPlainText(QString::number(dataManager.utilizationBound));
+    ui->laylandCalculationText->setPlainText(dataManager.laylandCalculationString);
+
+    if(dataManager.utilizationU <= dataManager.utilizationBound)
+    {
+        ui->schedulabilityStatusText->setPlainText("Success.");
+        ui->schedulabilityStatusText->setStyleSheet("color:green;");
+        SetupDataVisualization();
+    }
+    else if((dataManager.utilizationBound < dataManager.utilizationU) && (dataManager.utilizationU < 1))
+    {
+        ui->schedulabilityStatusText->setPlainText("Inconclusive.");
+        ui->schedulabilityStatusText->setStyleSheet("color:DarkOrange;");
+        SetupDataVisualization();
+    }
+    else
+    {
+        ui->schedulabilityStatusText->setPlainText("Overload.");
+        ui->schedulabilityStatusText->setStyleSheet("color:red;");
+    }
+}
+
+void MainWindow::SetupDataVisualization()
+{
+    // Visualize data
+    DataVisualizer dataVisualizer;
+    dataVisualizer.VisualizeData();
+    ui->rmsTimelineStringText->setPlainText(dataVisualizer.rmsTimelineString);
+    ui->timelineGraphAsStringText->setPlainText(dataVisualizer.timelineGraphAsString);
+    ui->dmsTimelineStringText->setPlainText(dataVisualizer.dmsTimelineString);
+}
+
 void MainWindow::Cleanup()
 {
     DataManager::rawDataList.clear();
@@ -128,7 +134,8 @@ void MainWindow::Cleanup()
     ui->processedTaskSetTable->clear();
     ui->processedTaskSetTable->setRowCount(0);
     ui->timelineGraphAsStringText->setPlainText("");
-    ui->timelineStringText->setPlainText("");
+    ui->rmsTimelineStringText->setPlainText("");
+    ui->dmsTimelineStringText->setPlainText("");
 }
 
 void MainWindow::DrawTimelineGraph()
