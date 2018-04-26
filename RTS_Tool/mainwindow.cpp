@@ -58,6 +58,7 @@ void MainWindow::SetupRawDataTable()
     ui->rawTaskSetTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Process Name"), QTableWidgetItem::Type));
     ui->rawTaskSetTable->setHorizontalHeaderItem(1, new QTableWidgetItem(QString("Period T"), QTableWidgetItem::Type));
     ui->rawTaskSetTable->setHorizontalHeaderItem(2, new QTableWidgetItem(QString("Computation Time C"), QTableWidgetItem::Type));
+    ui->rawTaskSetTable->setHorizontalHeaderItem(3, new QTableWidgetItem(QString("Deadline D"), QTableWidgetItem::Type));
 
     for(int i=0;i<DataManager::rawDataList.size();i++)
     {
@@ -65,6 +66,7 @@ void MainWindow::SetupRawDataTable()
         ui->rawTaskSetTable->setItem(i, 0, new QTableWidgetItem(DataManager::rawDataList.at(i).processName));
         ui->rawTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(DataManager::rawDataList.at(i).periodT)));
         ui->rawTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(DataManager::rawDataList.at(i).computationTimeC)));
+        ui->rawTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(DataManager::rawDataList.at(i).deadlineD)));
     }
 }
 

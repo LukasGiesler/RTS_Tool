@@ -9,12 +9,14 @@ struct RawDataRow
     QString processName;
     int periodT;
     int computationTimeC;
+    int deadlineD;
 
-    RawDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC)
+    RawDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inDeadlineD)
     {
         processName = inProcessName;
         periodT = inPeriodT;
         computationTimeC = inComputationTimeC;
+        deadlineD = inDeadlineD;
     }
 };
 
@@ -48,16 +50,49 @@ struct ProcessedDataRow
     }
 };
 
+struct dmsDataRow
+{
+    QString processName;
+    int periodT;
+    int computationTimeC;
+    int dmsPriority;
+    float utilizationU;
+    float availableT;
+
+    dmsDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inDmsPriority, float inUtilizationU)
+    {
+        processName = inProcessName;
+        periodT = inPeriodT;
+        computationTimeC = inComputationTimeC;
+        dmsPriority = inDmsPriority;
+        utilizationU = inUtilizationU;
+        availableT = 0;
+    }
+
+    dmsDataRow(const dmsDataRow& inDmsDataRow)
+    {
+        processName = inDmsDataRow.processName;
+        periodT = inDmsDataRow.periodT;
+        computationTimeC = inDmsDataRow.computationTimeC;
+        dmsPriority = inDmsDataRow.dmsPriority;
+        utilizationU = inDmsDataRow.utilizationU;
+        availableT = inDmsDataRow.availableT;
+    }
+};
+
 class DataManager
 {
 public:
     DataManager();
 
     // Adds raw data to the data manager
-    void AddRawData(QStringList processNameList, QStringList periodTList, QStringList computationTimeCList);
+    void AddRawData(QStringList processNameList, QStringList periodTList, QStringList computationTimeCList, QStringList deadlineDList);
 
-    // Processes the raw data
+    // Turns raw data to rms data
     void ProcessRawData();
+
+    // Turns raw data to dms data
+    void ProcessDmsData();
 
     // Resets the data manager
     void Cleanup();
@@ -66,6 +101,7 @@ public:
 
     static QList<RawDataRow> rawDataList;
     static QList<ProcessedDataRow> processedDataList;
+    static QList<dmsDataRow> dmsDataList;
 
     bool isSchedulable = false;
     float utilizationU;
@@ -77,6 +113,10 @@ public:
         return s1.periodT < s2.periodT;
     }
 
+    static bool dmsComparison(const dmsDataRow &s1, const dmsDataRow &s2)
+    {
+        return s1.periodT < s2.periodT;
+    }
 
 };
 

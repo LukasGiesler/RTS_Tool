@@ -9,6 +9,8 @@ public:
     DataVisualizer();
 
     void VisualizeData();
+    void ScheduleRMS();
+    void ScheduleDMS();
     int CalculateGCD(int a, int b);
     int CalculateLCM();
 

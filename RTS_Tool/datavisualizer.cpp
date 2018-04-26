@@ -10,9 +10,35 @@ DataVisualizer::DataVisualizer()
 
 void DataVisualizer::VisualizeData()
 {
-    // Cleanup
-    rmsTimelineString.clear();
+    ScheduleRMS();
+    ScheduleDMS();
+}
 
+
+// Calculates Lowest Common Mulitple
+int DataVisualizer::CalculateLCM()
+{
+    int outLCM = DataManager::processedDataList.at(0).periodT;
+    for(int i=0; i<DataManager::processedDataList.size(); i++)
+    {
+        outLCM = (((DataManager::processedDataList.at(i).periodT * outLCM))/(CalculateGCD(DataManager::processedDataList.at(i).periodT, outLCM)));
+
+    }
+    qDebug() << QString::number(outLCM);
+    return outLCM;
+}
+
+// Calculates Greatest Common Divider
+int DataVisualizer::CalculateGCD(int a, int b)
+{
+    if (b == 0)
+        return a;
+    return CalculateGCD(b, a % b);
+}
+
+void DataVisualizer::ScheduleRMS()
+{
+    rmsTimelineString.clear();
     int minorCycleLength = DataManager::processedDataList.at(0).periodT;
     int majorCycleLength = CalculateLCM();
     int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
@@ -128,24 +154,8 @@ void DataVisualizer::VisualizeData()
     }
 }
 
-
-// Calculates Lowest Common Mulitple
-int DataVisualizer::CalculateLCM()
+void DataVisualizer::ScheduleDMS()
 {
-    int outLCM = DataManager::processedDataList.at(0).periodT;
-    for(int i=0; i<DataManager::processedDataList.size(); i++)
-    {
-        outLCM = (((DataManager::processedDataList.at(i).periodT * outLCM))/(CalculateGCD(DataManager::processedDataList.at(i).periodT, outLCM)));
-
-    }
-    qDebug() << QString::number(outLCM);
-    return outLCM;
-}
-
-// Calculates Greatest Common Divider
-int DataVisualizer::CalculateGCD(int a, int b)
-{
-    if (b == 0)
-        return a;
-    return CalculateGCD(b, a % b);
+    dmsTimelineString.clear();
+    dmsTimelineString.append("abc");
 }
