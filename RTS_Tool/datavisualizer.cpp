@@ -49,6 +49,7 @@ void DataVisualizer::VisualizeData()
             // Check if current task is available (computation finished)
             if(DataManager::processedDataList.at(i).availableT <= globalT)
             {
+                qDebug() << "If: " << (currentCycleC + DataManager::processedDataList.at(i).computationTimeC);
                 // Check if the current task fits into the current minor cycle
                 if((currentCycleC + DataManager::processedDataList.at(i).computationTimeC) <= minorCycleLength)
                 {//Fit
@@ -76,7 +77,7 @@ void DataVisualizer::VisualizeData()
                         }
                     }
 
-                    qDebug() << DataManager::processedDataList.at(i).processName << " executes for " << DataManager::processedDataList.at(i).computationTimeC << " and will finish at t = " << DataManager::processedDataList.at(i).availableT;
+                    //qDebug() << DataManager::processedDataList.at(i).processName << " executes for " << DataManager::processedDataList.at(i).computationTimeC << " and will finish at t = " << DataManager::processedDataList.at(i).availableT;
                 }
                 else
                 {//Doesn't fit
@@ -84,8 +85,22 @@ void DataVisualizer::VisualizeData()
                 }
             }
         }
+        qDebug() << minorCycleLength-currentCycleC;
+        // Debug Graph
+        for(int k=0; k<timelineGraphStrings.size(); k++)
+        {
+            for(int l=0; l<minorCycleLength-currentCycleC; l++)
+            {
+                timelineGraphStrings[k].append(".");
+            }
+        }
         currentCycleC = 0;
         timelineString.append(" ");
+
+        for(int k=0; k<timelineGraphStrings.size(); k++)
+        {
+            timelineGraphStrings[k].append(" ");
+        }
     }
 
     // Debug Graph End
@@ -96,6 +111,10 @@ void DataVisualizer::VisualizeData()
     }
     for(int i=0; i<timelineGraphStrings[0].size(); i++)
     {
+        if(i > majorCycleLength)
+        {
+            break;
+        }
         if(i==0)
         {
              timelineGraphAsString.append(" ");
@@ -103,14 +122,19 @@ void DataVisualizer::VisualizeData()
         else if(i%5==0)
         {
             timelineGraphAsString.append(QString::number(i));
+            if(i%(minorCycleLength)==0)
+            {
+                timelineGraphAsString.append(" ");
+                continue;
+            }
         }
         else
         {
-            if(i>=100 && (i+2)%5 == 0)
+            if(i>=98 && (i+2)%5 == 0)
             {
                 continue;
             }
-            else if(i>=10 && (i+1)%5 == 0)
+            else if(i>=9 && (i+1)%5 == 0)
             {
                 continue;
             }

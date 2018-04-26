@@ -127,6 +127,8 @@ void MainWindow::Cleanup()
     ui->rawTaskSetTable->setRowCount(0);
     ui->processedTaskSetTable->clear();
     ui->processedTaskSetTable->setRowCount(0);
+    ui->timelineGraphAsStringText->setPlainText("");
+    ui->timelineStringText->setPlainText("");
 }
 
 void MainWindow::DrawTimelineGraph()

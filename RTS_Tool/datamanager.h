@@ -72,8 +72,10 @@ public:
 
     static bool dataComparison(const ProcessedDataRow &s1, const ProcessedDataRow &s2)
     {
-        return s1.periodT > s2.periodT;
+        return s1.periodT < s2.periodT;
     }
+
+
 };
 
 #endif // DATAMANAGER_H

@@ -33,8 +33,8 @@ bool FileManager::ImportFile(QString inFile)
 
 
     // Debug Output
-    qDebug() << processNameList;
-    qDebug() << periodTList;
-    qDebug() << computationTimeCList;
+    //qDebug() << processNameList;
+    //qDebug() << periodTList;
+    //qDebug() << computationTimeCList;
     return true;
 }

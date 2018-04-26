@@ -35,7 +35,7 @@ void DataManager::ProcessRawData()
     // Add priority based on sort
     for(int i=0;i<processedDataList.size();i++)
     {
-        processedDataList[i].rmsPriority = i+1;
+        processedDataList[i].rmsPriority = processedDataList.size() - i;
     }
 
     // Calculate Lui-Layland Utilization U for the task set

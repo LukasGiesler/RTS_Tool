@@ -14,6 +14,8 @@ public:
 
     QString timelineString;
     QString timelineGraphAsString;
+
+    QString dmsTimelineString;
 };
 
 #endif // DATAVISUALIZER_H
