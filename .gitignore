@@ -1,0 +1,9 @@
+
+*.stash
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.Debug
+*.Release
+*.user
