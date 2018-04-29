@@ -27,6 +27,7 @@ struct ProcessData
         remainingC = computationTimeC;
     }
 
+    ProcessData(const ProcessData& inProcessData)
     {
         processName = inProcessData.processName;
         periodT = inProcessData.periodT;
@@ -41,10 +42,13 @@ struct ProcessData
 
 struct ScheduleInfo
 {
+    ProcessData* processData;
     int scheduledDuration;
     int minorCycleIndex;
 
+    ScheduleInfo(ProcessData* inProcessData, int inScheduledDuration, int inMinorCycleIndex)
     {
+        processData = inProcessData;
         scheduledDuration = inScheduledDuration;
         minorCycleIndex = inMinorCycleIndex;
     }
@@ -71,6 +75,7 @@ public:
     void LuiLaylandTest();
 
     // Schedules a task
+    void ScheduleTask(QList<ScheduleInfo*>& schedule, ProcessData* inProcessData, int inDuration, int inMinorCycleIndex);
 
     // Creates RMS Schedule
     void ScheduleRMS();
@@ -90,6 +95,8 @@ public:
     QList<ProcessData> DMS_DataList;
 
     // Schedule Lists
+    QList<ScheduleInfo*> RMS_Schedule;
+    QList<ScheduleInfo*> DMS_Schedule;
 
     // Other. todo: replace them
     bool isSchedulable = false;
