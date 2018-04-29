@@ -108,9 +108,9 @@ public:
 
     void LuiLaylandTest();
 
-    static QList<RawDataRow> rawDataList;
-    static QList<ProcessedDataRow> processedDataList;
-    static QList<dmsDataRow> dmsDataList;
+    QList<RawDataRow> rawDataList;
+    QList<ProcessedDataRow> processedDataList;
+    QList<dmsDataRow> dmsDataList;
 
     bool isSchedulable = false;
     float utilizationU;

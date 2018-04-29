@@ -3,10 +3,6 @@
 #include "qdebug.h"
 #include <cmath>
 
-QList<RawDataRow> DataManager::rawDataList;
-QList<ProcessedDataRow> DataManager::processedDataList;
-QList<dmsDataRow> DataManager::dmsDataList;
-
 DataManager::DataManager()
 {
 

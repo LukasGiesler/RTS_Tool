@@ -2,9 +2,6 @@
 #include "ui_mainwindow.h"
 #include "qfiledialog.h"
 #include "qvariant.h"
-#include "filemanager.h"
-#include "datamanager.h"
-#include "datavisualizer.h"
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include "qdebug.h"
@@ -17,6 +14,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(0);
+
+    dataManager = new DataManager();
+    fileManager = new FileManager(dataManager);
+    dataVisualizer = new DataVisualizer(dataManager);
 }
 
 MainWindow::~MainWindow()
@@ -29,9 +30,8 @@ void MainWindow::on_pushButton_clicked()
     Cleanup();
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import task set"), "", tr("Task set (*.csv)"));
-    FileManager fileManager;
 
-    if(!fileManager.ImportFile(fileName))
+    if(!fileManager->ImportFile(fileName))
     {
         ui->importErrorText->setPlainText("Import failed.");
         return;
@@ -40,21 +40,20 @@ void MainWindow::on_pushButton_clicked()
     ui->importNameText->setPlainText(fileName);
     ui->importErrorText->setPlainText("");
 
+    // Process task set
+    dataManager->ProcessRawData();
+
     // Setup raw task set table
     SetupRawDataTable();
-
-    // Process task set
-    DataManager dataManager;
-    dataManager.ProcessRawData();
 
     // Setup processed task set table
     SetupProcessedDataTable();
 
     // Setup Schedulability Test
-    SetupSchedulabilityTest(dataManager);
+    SetupSchedulabilityTest();
 
     // Setup dms task set
-    dataManager.ProcessDmsData();
+    dataManager->ProcessDmsData();
     SetupDmsDataTable();
 }
 
@@ -65,13 +64,13 @@ void MainWindow::SetupRawDataTable()
     ui->rawTaskSetTable->setHorizontalHeaderItem(2, new QTableWidgetItem(QString("Computation Time C"), QTableWidgetItem::Type));
     ui->rawTaskSetTable->setHorizontalHeaderItem(3, new QTableWidgetItem(QString("Deadline D"), QTableWidgetItem::Type));
 
-    for(int i=0;i<DataManager::rawDataList.size();i++)
+    for(int i=0;i<dataManager->rawDataList.size();i++)
     {
         ui->rawTaskSetTable->insertRow(ui->rawTaskSetTable->rowCount());
-        ui->rawTaskSetTable->setItem(i, 0, new QTableWidgetItem(DataManager::rawDataList.at(i).processName));
-        ui->rawTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(DataManager::rawDataList.at(i).periodT)));
-        ui->rawTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(DataManager::rawDataList.at(i).computationTimeC)));
-        ui->rawTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(DataManager::rawDataList.at(i).deadlineD)));
+        ui->rawTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->rawDataList.at(i).processName));
+        ui->rawTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->rawDataList.at(i).periodT)));
+        ui->rawTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->rawDataList.at(i).computationTimeC)));
+        ui->rawTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->rawDataList.at(i).deadlineD)));
     }
 }
 
@@ -83,14 +82,14 @@ void MainWindow::SetupProcessedDataTable()
     ui->processedTaskSetTable->setHorizontalHeaderItem(3, new QTableWidgetItem(QString("RMS Priority"), QTableWidgetItem::Type));
     ui->processedTaskSetTable->setHorizontalHeaderItem(4, new QTableWidgetItem(QString("Utilization U"), QTableWidgetItem::Type));
 
-    for(int i=0;i<DataManager::rawDataList.size();i++)
+    for(int i=0;i<dataManager->rawDataList.size();i++)
     {
         ui->processedTaskSetTable->insertRow(ui->processedTaskSetTable->rowCount());
-        ui->processedTaskSetTable->setItem(i, 0, new QTableWidgetItem(DataManager::processedDataList.at(i).processName));
-        ui->processedTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(DataManager::processedDataList.at(i).periodT)));
-        ui->processedTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(DataManager::processedDataList.at(i).computationTimeC)));
-        ui->processedTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(DataManager::processedDataList.at(i).rmsPriority)));
-        ui->processedTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(DataManager::processedDataList.at(i).utilizationU)));
+        ui->processedTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->processedDataList.at(i).processName));
+        ui->processedTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).periodT)));
+        ui->processedTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).computationTimeC)));
+        ui->processedTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).rmsPriority)));
+        ui->processedTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).utilizationU)));
     }
 
     ui->tabWidget->setCurrentIndex(1);
@@ -104,32 +103,32 @@ void MainWindow::SetupDmsDataTable()
     ui->dmsTaskSetTable->setHorizontalHeaderItem(3, new QTableWidgetItem(QString("Deadline D"), QTableWidgetItem::Type));
     ui->dmsTaskSetTable->setHorizontalHeaderItem(4, new QTableWidgetItem(QString("DMS Priority"), QTableWidgetItem::Type));
 
-    for(int i=0;i<DataManager::rawDataList.size();i++)
+    for(int i=0;i<dataManager->rawDataList.size();i++)
     {
-        qDebug() << DataManager::dmsDataList.size();
+        qDebug() << dataManager->dmsDataList.size();
         ui->dmsTaskSetTable->insertRow(ui->dmsTaskSetTable->rowCount());
-        ui->dmsTaskSetTable->setItem(i, 0, new QTableWidgetItem(DataManager::dmsDataList.at(i).processName));
-        ui->dmsTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).periodT)));
-        ui->dmsTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).computationTimeC)));
-        ui->dmsTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).deadlineD)));
-        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(DataManager::dmsDataList.at(i).dmsPriority)));
+        ui->dmsTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->dmsDataList.at(i).processName));
+        ui->dmsTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).periodT)));
+        ui->dmsTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).computationTimeC)));
+        ui->dmsTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).deadlineD)));
+        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).dmsPriority)));
     }
 
 }
 
-void MainWindow::SetupSchedulabilityTest(DataManager& dataManager)
+void MainWindow::SetupSchedulabilityTest()
 {
-    ui->utilizationUText->setPlainText(QString::number(dataManager.utilizationU));
-    ui->utilizationBound->setPlainText(QString::number(dataManager.utilizationBound));
-    ui->laylandCalculationText->setPlainText(dataManager.laylandCalculationString);
+    ui->utilizationUText->setPlainText(QString::number(dataManager->utilizationU));
+    ui->utilizationBound->setPlainText(QString::number(dataManager->utilizationBound));
+    ui->laylandCalculationText->setPlainText(dataManager->laylandCalculationString);
 
-    if(dataManager.utilizationU <= dataManager.utilizationBound)
+    if(dataManager->utilizationU <= dataManager->utilizationBound)
     {
         ui->schedulabilityStatusText->setPlainText("Success.");
         ui->schedulabilityStatusText->setStyleSheet("color:green;");
         SetupDataVisualization();
     }
-    else if((dataManager.utilizationBound < dataManager.utilizationU) && (dataManager.utilizationU <= 1))
+    else if((dataManager->utilizationBound < dataManager->utilizationU) && (dataManager->utilizationU <= 1))
     {
         ui->schedulabilityStatusText->setPlainText("Inconclusive.");
         ui->schedulabilityStatusText->setStyleSheet("color:DarkOrange;");
@@ -145,18 +144,14 @@ void MainWindow::SetupSchedulabilityTest(DataManager& dataManager)
 void MainWindow::SetupDataVisualization()
 {
     // Visualize data
-    DataVisualizer dataVisualizer;
-    dataVisualizer.VisualizeData();
-    ui->rmsTimelineStringText->setPlainText(dataVisualizer.rmsTimelineString);
-    ui->timelineGraphAsStringText->setPlainText(dataVisualizer.timelineGraphAsString);
-    ui->dmsTimelineStringText->setPlainText(dataVisualizer.dmsTimelineString);
+    dataVisualizer->VisualizeData();
+    ui->rmsTimelineStringText->setPlainText(dataVisualizer->rmsTimelineString);
+    ui->timelineGraphAsStringText->setPlainText(dataVisualizer->timelineGraphAsString);
+    ui->dmsTimelineStringText->setPlainText(dataVisualizer->dmsTimelineString);
 }
 
 void MainWindow::Cleanup()
 {
-    DataManager::rawDataList.clear();
-    DataManager::processedDataList.clear();
-
     ui->rawTaskSetTable->clear();
     ui->rawTaskSetTable->setRowCount(0);
     ui->processedTaskSetTable->clear();

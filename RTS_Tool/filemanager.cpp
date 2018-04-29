@@ -8,6 +8,11 @@ FileManager::FileManager()
 
 }
 
+FileManager::FileManager(DataManager* inDataManager)
+{
+    dataManager = inDataManager;
+}
+
 // Reads a .csv file
 bool FileManager::ImportFile(QString inFile)
 {
@@ -37,8 +42,7 @@ bool FileManager::ImportFile(QString inFile)
     }
 
     // Add imported data to the static data manager list
-    DataManager dataManager;
-    dataManager.AddRawData(processNameList, periodTList, computationTimeCList, deadlineDList);
+    dataManager->AddRawData(processNameList, periodTList, computationTimeCList, deadlineDList);
 
 
     // Debug Output

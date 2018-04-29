@@ -8,6 +8,12 @@ DataVisualizer::DataVisualizer()
 
 }
 
+
+DataVisualizer::DataVisualizer(DataManager* inDataManager)
+{
+    dataManager = inDataManager;
+}
+
 void DataVisualizer::VisualizeData()
 {
     ScheduleRMS();
@@ -18,10 +24,10 @@ void DataVisualizer::VisualizeData()
 // Calculates Lowest Common Mulitple
 int DataVisualizer::CalculateLCM()
 {
-    int outLCM = DataManager::processedDataList.at(0).periodT;
-    for(int i=0; i<DataManager::processedDataList.size(); i++)
+    int outLCM = dataManager->processedDataList.at(0).periodT;
+    for(int i=0; i<dataManager->processedDataList.size(); i++)
     {
-        outLCM = (((DataManager::processedDataList.at(i).periodT * outLCM))/(CalculateGCD(DataManager::processedDataList.at(i).periodT, outLCM)));
+        outLCM = (((dataManager->processedDataList.at(i).periodT * outLCM))/(CalculateGCD(dataManager->processedDataList.at(i).periodT, outLCM)));
 
     }
     return outLCM;
@@ -38,7 +44,7 @@ int DataVisualizer::CalculateGCD(int a, int b)
 void DataVisualizer::ScheduleRMS()
 {
     rmsTimelineString.clear();
-    int minorCycleLength = DataManager::processedDataList.at(0).periodT;
+    int minorCycleLength = dataManager->processedDataList.at(0).periodT;
     int majorCycleLength = CalculateLCM();
     int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
     int globalT = 0;
@@ -46,9 +52,9 @@ void DataVisualizer::ScheduleRMS()
 
     // RMS Timeline Graph, draw Y Axis
     QList<QString> timelineGraphStrings;
-    for(int i=0; i<DataManager::processedDataList.size(); i++)
+    for(int i=0; i<dataManager->processedDataList.size(); i++)
     {
-        timelineGraphStrings.append(DataManager::processedDataList.at(i).processName);
+        timelineGraphStrings.append(dataManager->processedDataList.at(i).processName);
     }
 
     // Schedule a major cycle
@@ -59,21 +65,18 @@ void DataVisualizer::ScheduleRMS()
         currentCycleC = 0;
 
         // Schedule a minor cycle
-        for(int i=0; i<DataManager::processedDataList.size(); i++)
+        for(int i=0; i<dataManager->processedDataList.size(); i++)
         {
             // Check if current task is available (computation finished)
-            if(DataManager::processedDataList.at(i).availableT <= globalT)
+            if(dataManager->processedDataList.at(i).availableT <= globalT)
             {
                 // Check if the current task fits into the current minor cycle
-                if((currentCycleC + DataManager::processedDataList.at(i).computationTimeC) <= minorCycleLength)
+                if((currentCycleC + dataManager->processedDataList.at(i).computationTimeC) <= minorCycleLength)
                 {//Fit
-                    ProcessedDataRow newProcessedDataRow = DataManager::processedDataList.at(i);
-                    currentCycleC += DataManager::processedDataList.at(i).computationTimeC;
-                    newProcessedDataRow.availableT = globalT + DataManager::processedDataList.at(i).periodT;// todo: Consider what happens if minor cycle length is exceeded here
-                    globalT += DataManager::processedDataList.at(i).computationTimeC;
-                    rmsTimelineString.append(newProcessedDataRow.processName);
-                    DataManager::processedDataList.removeAt(i);
-                    DataManager::processedDataList.insert(i, newProcessedDataRow);
+                    currentCycleC += dataManager->processedDataList.at(i).computationTimeC;
+                    dataManager->processedDataList[i].availableT = globalT + dataManager->processedDataList.at(i).periodT;// todo: Consider what happens if minor cycle length is exceeded here
+                    globalT += dataManager->processedDataList.at(i).computationTimeC;
+                    rmsTimelineString.append(dataManager->processedDataList.at(i).processName);
                 }
                 else
                 {//Doesn't fit
@@ -83,7 +86,7 @@ void DataVisualizer::ScheduleRMS()
                 // RMS Timeline Graph, draw process status
                 for(int k=0; k<timelineGraphStrings.size(); k++)
                 {
-                    for(int l=0; l<DataManager::processedDataList.at(i).computationTimeC; l++)
+                    for(int l=0; l<dataManager->processedDataList.at(i).computationTimeC; l++)
                     {
                         if(k == i)
                         {
