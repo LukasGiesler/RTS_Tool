@@ -41,13 +41,8 @@ bool FileManager::ImportFile(QString inFile)
         }
     }
 
-    // Add imported data to the static data manager list
+    // Add imported data to the data manager list
     dataManager->AddRawData(processNameList, periodTList, computationTimeCList, deadlineDList);
 
-
-    // Debug Output
-    //qDebug() << processNameList;
-    //qDebug() << periodTList;
-    //qDebug() << computationTimeCList;
     return true;
 }

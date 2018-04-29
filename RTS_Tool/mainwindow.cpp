@@ -41,7 +41,7 @@ void MainWindow::on_pushButton_clicked()
     ui->importErrorText->setPlainText("");
 
     // Process task set
-    dataManager->ProcessRawData();
+    dataManager->ProcessRmsData();
 
     // Setup raw task set table
     SetupRawDataTable();
@@ -88,7 +88,7 @@ void MainWindow::SetupProcessedDataTable()
         ui->processedTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->processedDataList.at(i).processName));
         ui->processedTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).periodT)));
         ui->processedTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).computationTimeC)));
-        ui->processedTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).rmsPriority)));
+        ui->processedTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).priority)));
         ui->processedTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).utilizationU)));
     }
 
@@ -111,7 +111,7 @@ void MainWindow::SetupDmsDataTable()
         ui->dmsTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).periodT)));
         ui->dmsTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).computationTimeC)));
         ui->dmsTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).deadlineD)));
-        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).dmsPriority)));
+        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).priority)));
     }
 
 }

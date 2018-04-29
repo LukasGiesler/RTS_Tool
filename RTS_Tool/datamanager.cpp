@@ -12,18 +12,19 @@ void DataManager::AddRawData(QStringList processNameList, QStringList periodTLis
 {
     for(int i=0; i<processNameList.size(); i++)
     {
-        RawDataRow newRawDataRow(processNameList[i], periodTList[i].toInt(), computationTimeCList[i].toInt(), deadlineDList[i].toInt());
-        rawDataList.append(newRawDataRow);
+        ProcessData processData(processNameList[i], periodTList[i].toInt(), computationTimeCList[i].toInt(), deadlineDList[i].toInt(), 0);
+        qDebug() << processData.deadlineD;
+        rawDataList.append(processData);
     }
 }
 
-void DataManager::ProcessRawData()
+void DataManager::ProcessRmsData()
 {
     // Create processed data list
     for(int i=0;i<rawDataList.size();i++)
     {
-        ProcessedDataRow newProcessedDataRow(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, 0, 0);
-        processedDataList.append(newProcessedDataRow);
+        ProcessData processData(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, 0, 0);
+        processedDataList.append(processData);
     }
 
     // Sort by period T to determine priority based on rate monotonic scheduling
@@ -32,11 +33,33 @@ void DataManager::ProcessRawData()
     // Add priority based on sort
     for(int i=0;i<processedDataList.size();i++)
     {
-        processedDataList[i].rmsPriority = processedDataList.size() - i;
+        processedDataList[i].priority = processedDataList.size() - i;
     }
 
     // Test schedulability
     LuiLaylandTest();
+}
+
+void DataManager::ProcessDmsData()
+{
+    // Create processed data list
+    for(int i=0;i<rawDataList.size();i++)
+    {
+        ProcessData processData(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, rawDataList[i].deadlineD, 0);
+        dmsDataList.append(processData);
+    }
+
+    // Sort by period T to determine priority based on deadline monotonic scheduling
+    std::sort(dmsDataList.begin(), dmsDataList.end(), DataManager::dmsComparison);
+
+    // Add priority based on sort
+    for(int i=0;i<dmsDataList.size();i++)
+    {
+        dmsDataList[i].priority = dmsDataList.size() - i;
+    }
+
+    // Test schedulability
+    //LuiLaylandTest();
 }
 
 void DataManager::LuiLaylandTest()
@@ -58,24 +81,3 @@ void DataManager::LuiLaylandTest()
     utilizationBound = processedDataList.size()*(std::pow(2.f,1.f/processedDataList.size())-1.f);
 }
 
-void DataManager::ProcessDmsData()
-{
-    // Create processed data list
-    for(int i=0;i<rawDataList.size();i++)
-    {
-        dmsDataRow newDmsDataRow(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, rawDataList[i].deadlineD, 0, 0);
-        dmsDataList.append(newDmsDataRow);
-    }
-
-    // Sort by period T to determine priority based on deadline monotonic scheduling
-    std::sort(dmsDataList.begin(), dmsDataList.end(), DataManager::dmsComparison);
-
-    // Add priority based on sort
-    for(int i=0;i<dmsDataList.size();i++)
-    {
-        dmsDataList[i].dmsPriority = dmsDataList.size() - i;
-    }
-
-    // Test schedulability
-    //LuiLaylandTest();
-}
