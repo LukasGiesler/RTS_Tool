@@ -85,11 +85,11 @@ void MainWindow::SetupProcessedDataTable()
     for(int i=0;i<dataManager->rawDataList.size();i++)
     {
         ui->processedTaskSetTable->insertRow(ui->processedTaskSetTable->rowCount());
-        ui->processedTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->processedDataList.at(i).processName));
-        ui->processedTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).periodT)));
-        ui->processedTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).computationTimeC)));
-        ui->processedTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).priority)));
-        ui->processedTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->processedDataList.at(i).utilizationU)));
+        ui->processedTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->RMS_DataList.at(i).processName));
+        ui->processedTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->RMS_DataList.at(i).periodT)));
+        ui->processedTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->RMS_DataList.at(i).computationTimeC)));
+        ui->processedTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->RMS_DataList.at(i).priority)));
+        ui->processedTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->RMS_DataList.at(i).utilizationU)));
     }
 
     ui->tabWidget->setCurrentIndex(1);
@@ -105,13 +105,12 @@ void MainWindow::SetupDmsDataTable()
 
     for(int i=0;i<dataManager->rawDataList.size();i++)
     {
-        qDebug() << dataManager->dmsDataList.size();
         ui->dmsTaskSetTable->insertRow(ui->dmsTaskSetTable->rowCount());
-        ui->dmsTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->dmsDataList.at(i).processName));
-        ui->dmsTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).periodT)));
-        ui->dmsTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).computationTimeC)));
-        ui->dmsTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).deadlineD)));
-        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->dmsDataList.at(i).priority)));
+        ui->dmsTaskSetTable->setItem(i, 0, new QTableWidgetItem(dataManager->DMS_DataList.at(i).processName));
+        ui->dmsTaskSetTable->setItem(i, 1, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).periodT)));
+        ui->dmsTaskSetTable->setItem(i, 2, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).computationTimeC)));
+        ui->dmsTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).deadlineD)));
+        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).priority)));
     }
 
 }
@@ -144,8 +143,10 @@ void MainWindow::SetupSchedulabilityTest()
 void MainWindow::SetupDataVisualization()
 {
     // Visualize data
+    dataManager->ScheduleRMS();
+    dataManager->ScheduleDMS();
     dataVisualizer->VisualizeData();
-    ui->rmsTimelineStringText->setPlainText(dataVisualizer->rmsTimelineString);
+    ui->rmsTimelineStringText->setPlainText(dataVisualizer->RMS_ScheduleString);
     ui->timelineGraphAsStringText->setPlainText(dataVisualizer->timelineGraphAsString);
     ui->dmsTimelineStringText->setPlainText(dataVisualizer->dmsTimelineString);
 }

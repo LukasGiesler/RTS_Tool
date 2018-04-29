@@ -26,6 +26,28 @@ struct ProcessData
         availableT = 0;
         remainingC = computationTimeC;
     }
+
+    {
+        processName = inProcessData.processName;
+        periodT = inProcessData.periodT;
+        computationTimeC = inProcessData.computationTimeC;
+        deadlineD = inProcessData.deadlineD;
+        priority = inProcessData.priority;
+        utilizationU = inProcessData.utilizationU;
+        availableT = inProcessData.utilizationU;
+        remainingC = inProcessData.remainingC;
+    }
+};
+
+struct ScheduleInfo
+{
+    int scheduledDuration;
+    int minorCycleIndex;
+
+    {
+        scheduledDuration = inScheduledDuration;
+        minorCycleIndex = inMinorCycleIndex;
+    }
 };
 
 class DataManager
@@ -45,17 +67,37 @@ public:
     // Resets the data manager
     void Cleanup();
 
+    // Executes the Lui Layland schedulability Test
     void LuiLaylandTest();
 
-    QList<ProcessData> rawDataList;
-    QList<ProcessData> processedDataList;
-    QList<ProcessData> dmsDataList;
+    // Schedules a task
 
+    // Creates RMS Schedule
+    void ScheduleRMS();
+
+    // Creates DMS Schedule
+    void ScheduleDMS();
+
+    // Calculates Greatest Common Divider
+    int CalculateGCD(int a, int b);
+
+    // Calculates Lowest Common Multiple
+    int CalculateLCM();
+
+    // Process Data Lists
+    QList<ProcessData> rawDataList;
+    QList<ProcessData> RMS_DataList;
+    QList<ProcessData> DMS_DataList;
+
+    // Schedule Lists
+
+    // Other. todo: replace them
     bool isSchedulable = false;
     float utilizationU;
     float utilizationBound;
     QString laylandCalculationString;
 
+    // Comparision Operators
     static bool dataComparison(const ProcessData &s1, const ProcessData &s2)
     {
         return s1.periodT < s2.periodT;

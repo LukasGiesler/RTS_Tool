@@ -11,12 +11,10 @@ public:
     DataVisualizer(DataManager* inDataManager);
 
     void VisualizeData();
-    void ScheduleRMS();
-    void ScheduleDMS();
-    int CalculateGCD(int a, int b);
-    int CalculateLCM();
+    void DrawRMS();
+    void DrawDMS();
 
-    QString rmsTimelineString;
+    QString RMS_ScheduleString;
     QString timelineGraphAsString;
 
     QString dmsTimelineString;

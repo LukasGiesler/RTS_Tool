@@ -16,127 +16,98 @@ DataVisualizer::DataVisualizer(DataManager* inDataManager)
 
 void DataVisualizer::VisualizeData()
 {
-    ScheduleRMS();
-    ScheduleDMS();
+    DrawRMS();
+    DrawDMS();
 }
 
-
-// Calculates Lowest Common Mulitple
-int DataVisualizer::CalculateLCM()
+void DataVisualizer::DrawRMS()
 {
-    int outLCM = dataManager->processedDataList.at(0).periodT;
-    for(int i=0; i<dataManager->processedDataList.size(); i++)
+    RMS_ScheduleString.clear();
+    timelineGraphAsString.clear();
+    // Timeline String
+    int currentMinorCycle = -1;
+    for(int i=0; i<dataManager->RMS_Schedule.size(); i++)
     {
-        outLCM = (((dataManager->processedDataList.at(i).periodT * outLCM))/(CalculateGCD(dataManager->processedDataList.at(i).periodT, outLCM)));
-
-    }
-    return outLCM;
-}
-
-// Calculates Greatest Common Divider
-int DataVisualizer::CalculateGCD(int a, int b)
-{
-    if (b == 0)
-        return a;
-    return CalculateGCD(b, a % b);
-}
-
-void DataVisualizer::ScheduleRMS()
-{
-    rmsTimelineString.clear();
-    int minorCycleLength = dataManager->processedDataList.at(0).periodT;
-    int majorCycleLength = CalculateLCM();
-    int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
-    int globalT = 0;
-    int currentCycleC = 0;
-
-    // RMS Timeline Graph, draw Y Axis
-    QList<QString> timelineGraphStrings;
-    for(int i=0; i<dataManager->processedDataList.size(); i++)
-    {
-        timelineGraphStrings.append(dataManager->processedDataList.at(i).processName);
-    }
-
-    // Schedule a major cycle
-    for(int j=0; j<minorCyclesPerMajorCycle; j++)
-    {
-        // At the start of each minor cycle, the current t is known
-        globalT = j*minorCycleLength;
-        currentCycleC = 0;
-
-        // Schedule a minor cycle
-        for(int i=0; i<dataManager->processedDataList.size(); i++)
+        // Draw space after every minor cycle
+        if(dataManager->RMS_Schedule[i]->minorCycleIndex != currentMinorCycle)
         {
-            // Check if current task is available (computation finished)
-            if(dataManager->processedDataList.at(i).availableT <= globalT)
-            {
-                // Check if the current task fits into the current minor cycle
-                if((currentCycleC + dataManager->processedDataList.at(i).computationTimeC) <= minorCycleLength)
-                {//Fit
-                    currentCycleC += dataManager->processedDataList.at(i).computationTimeC;
-                    dataManager->processedDataList[i].availableT = globalT + dataManager->processedDataList.at(i).periodT;// todo: Consider what happens if minor cycle length is exceeded here
-                    globalT += dataManager->processedDataList.at(i).computationTimeC;
-                    rmsTimelineString.append(dataManager->processedDataList.at(i).processName);
+            RMS_ScheduleString.append(" ");
+            currentMinorCycle = dataManager->RMS_Schedule[i]->minorCycleIndex;
+        }
+
+        // Draw process name
+        RMS_ScheduleString.append(dataManager->RMS_Schedule[i]->processData->processName);
+    }
+
+    // Timeline Graph
+    currentMinorCycle = 0;
+    int minorCycleLength = dataManager->RMS_Schedule.at(0)->processData->periodT;
+    int majorCycleLength = dataManager->CalculateLCM();
+    int leftOverLength = 0;
+    int usedCycleLength = 0;
+
+    // Draw Y Axis
+    QList<QString> timelineRowStrings;
+    for(int i=0; i<dataManager->RMS_DataList.size(); i++)
+    {
+        timelineRowStrings.append(dataManager->RMS_DataList.at(i).processName);
+    }
+
+    // Draw process status
+    for(int i=0; i<dataManager->RMS_Schedule.size(); i++)
+    {//Every process
+        // Draw end of minor cycle
+        if(dataManager->RMS_Schedule[i]->minorCycleIndex != currentMinorCycle)
+        {
+            qDebug() << leftOverLength;
+            for(int m=0; m<timelineRowStrings.size(); m++)
+            {// Every string row
+                for(int l=0; l<leftOverLength; l++)
+                {
+                    timelineRowStrings[m].append(".");
+                }
+                timelineRowStrings[m].append(" ");
+            }
+            usedCycleLength = 0;
+        }
+
+        for(int j=0; j<timelineRowStrings.size(); j++)
+        {// Every string row
+            for(int k=0; k<dataManager->RMS_Schedule[i]->scheduledDuration; k++)
+            {// Every string row character
+                if(dataManager->RMS_Schedule[i]->processData->processName==timelineRowStrings[j].at(0))
+                {
+                    timelineRowStrings[j].append("-");
                 }
                 else
-                {//Doesn't fit
-
-                    break;
-                }
-                // RMS Timeline Graph, draw process status
-                for(int k=0; k<timelineGraphStrings.size(); k++)
                 {
-                    for(int l=0; l<dataManager->processedDataList.at(i).computationTimeC; l++)
-                    {
-                        if(k == i)
-                        {
-                            timelineGraphStrings[k].append("-");
-                        }
-                        else
-                        {
-                            timelineGraphStrings[k].append(".");
-                        }
-                    }
+                    timelineRowStrings[j].append(".");
                 }
             }
-        }
 
-        // RMS Timeline Graph, draw gap at end of minor cycle
-        for(int k=0; k<timelineGraphStrings.size(); k++)
-        {
-            for(int l=0; l<minorCycleLength-currentCycleC; l++)
-            {
-                timelineGraphStrings[k].append(".");
-            }
-            timelineGraphStrings[k].append(" ");
         }
-
-        rmsTimelineString.append(" ");
+        currentMinorCycle = dataManager->RMS_Schedule[i]->minorCycleIndex;
+        usedCycleLength += dataManager->RMS_Schedule[i]->scheduledDuration;
+        leftOverLength = minorCycleLength - usedCycleLength;
     }
 
-    // RMS Timeline Graph, draw newlines
-    for(int i=0; i<timelineGraphStrings.size(); i++)
+    // Draw newlines on each row and combine the rows to one string
+    for(int i=0; i<timelineRowStrings.size(); i++)
     {
-        timelineGraphStrings[i].append("\n");
-        timelineGraphAsString.append(timelineGraphStrings.at(i));
+        timelineRowStrings[i].append("\n");
+        timelineGraphAsString.append(timelineRowStrings.at(i));
     }
 
     // RMS Timeline Graph, draw X axis
-    for(int i=0; i<timelineGraphStrings[0].size(); i++)
+    for(int i=0; i<timelineRowStrings[0].size(); i++)
     {
-        if(i > majorCycleLength)
-        {
-            break;
-        }
-        if(i==0)
-        {
+        if(i > majorCycleLength) break;
+        if(i==0) {
              timelineGraphAsString.append(" ");
         }
-        else if(i%5==0)
-        {
+        else if(i%5==0) {
             timelineGraphAsString.append(QString::number(i));
-            if(i%(minorCycleLength)==0)
-            {
+            if(i%(minorCycleLength)==0) {
                 timelineGraphAsString.append(" ");
                 continue;
             }
@@ -156,8 +127,7 @@ void DataVisualizer::ScheduleRMS()
     }
 }
 
-void DataVisualizer::ScheduleDMS()
+void DataVisualizer::DrawDMS()
 {
-    dmsTimelineString.clear();
-    dmsTimelineString.append("abc");
+
 }
