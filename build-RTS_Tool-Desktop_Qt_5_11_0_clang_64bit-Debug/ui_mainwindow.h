@@ -23,7 +23,6 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTextEdit>
-#include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -48,18 +47,23 @@ public:
     QTableWidget *processedTaskSetTable;
     QWidget *gridLayoutWidget;
     QGridLayout *gridLayout;
-    QPlainTextEdit *utilizationUText;
     QPlainTextEdit *plainTextEdit_2;
     QPlainTextEdit *schedulabilityStatusText;
+    QPlainTextEdit *utilizationUText;
     QPlainTextEdit *plainTextEdit_4;
     QPlainTextEdit *laylandCalculationText;
     QTextEdit *textEdit;
+    QPlainTextEdit *plainTextEdit_3;
+    QPlainTextEdit *utilizationBound;
+    QWidget *tab_3;
+    QTableWidget *dmsTaskSetTable;
     QWidget *tab_6;
-    QTextEdit *timelineStringText;
+    QTextEdit *rmsTimelineStringText;
     QTextEdit *TextEdit;
     QTextEdit *timelineGraphAsStringText;
     QTextEdit *TextEdit_2;
-    QToolBar *mainToolBar;
+    QTextEdit *TextEdit_3;
+    QTextEdit *dmsTimelineStringText;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -120,22 +124,24 @@ public:
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
         rawTaskSetTable = new QTableWidget(tab_2);
-        if (rawTaskSetTable->columnCount() < 3)
-            rawTaskSetTable->setColumnCount(3);
+        if (rawTaskSetTable->columnCount() < 4)
+            rawTaskSetTable->setColumnCount(4);
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
         rawTaskSetTable->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
         rawTaskSetTable->setHorizontalHeaderItem(1, __qtablewidgetitem1);
         QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
         rawTaskSetTable->setHorizontalHeaderItem(2, __qtablewidgetitem2);
+        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
+        rawTaskSetTable->setHorizontalHeaderItem(3, __qtablewidgetitem3);
         rawTaskSetTable->setObjectName(QStringLiteral("rawTaskSetTable"));
         rawTaskSetTable->setEnabled(true);
-        rawTaskSetTable->setGeometry(QRect(10, 10, 421, 311));
-        rawTaskSetTable->setMaximumSize(QSize(421, 16777215));
+        rawTaskSetTable->setGeometry(QRect(10, 10, 561, 311));
+        rawTaskSetTable->setMaximumSize(QSize(16777215, 16777215));
         rawTaskSetTable->horizontalHeader()->setDefaultSectionSize(120);
         rawTaskSetTable->horizontalHeader()->setHighlightSections(true);
         rawTaskSetTable->horizontalHeader()->setMinimumSectionSize(39);
-        rawTaskSetTable->horizontalHeader()->setStretchLastSection(true);
+        rawTaskSetTable->horizontalHeader()->setStretchLastSection(false);
         rawTaskSetTable->verticalHeader()->setVisible(false);
         rawTaskSetTable->verticalHeader()->setDefaultSectionSize(30);
         rawTaskSetTable->verticalHeader()->setMinimumSectionSize(23);
@@ -147,16 +153,16 @@ public:
         processedTaskSetTable = new QTableWidget(tab_5);
         if (processedTaskSetTable->columnCount() < 5)
             processedTaskSetTable->setColumnCount(5);
-        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
-        processedTaskSetTable->setHorizontalHeaderItem(0, __qtablewidgetitem3);
         QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
-        processedTaskSetTable->setHorizontalHeaderItem(1, __qtablewidgetitem4);
+        processedTaskSetTable->setHorizontalHeaderItem(0, __qtablewidgetitem4);
         QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
-        processedTaskSetTable->setHorizontalHeaderItem(2, __qtablewidgetitem5);
+        processedTaskSetTable->setHorizontalHeaderItem(1, __qtablewidgetitem5);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
-        processedTaskSetTable->setHorizontalHeaderItem(3, __qtablewidgetitem6);
+        processedTaskSetTable->setHorizontalHeaderItem(2, __qtablewidgetitem6);
         QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
-        processedTaskSetTable->setHorizontalHeaderItem(4, __qtablewidgetitem7);
+        processedTaskSetTable->setHorizontalHeaderItem(3, __qtablewidgetitem7);
+        QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
+        processedTaskSetTable->setHorizontalHeaderItem(4, __qtablewidgetitem8);
         processedTaskSetTable->setObjectName(QStringLiteral("processedTaskSetTable"));
         processedTaskSetTable->setEnabled(true);
         processedTaskSetTable->setGeometry(QRect(10, 10, 611, 311));
@@ -172,20 +178,12 @@ public:
         processedTaskSetTable->verticalHeader()->setStretchLastSection(false);
         gridLayoutWidget = new QWidget(tab_5);
         gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
-        gridLayoutWidget->setGeometry(QRect(640, 10, 321, 152));
+        gridLayoutWidget->setGeometry(QRect(640, 10, 321, 211));
         gridLayout = new QGridLayout(gridLayoutWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
-        utilizationUText = new QPlainTextEdit(gridLayoutWidget);
-        utilizationUText->setObjectName(QStringLiteral("utilizationUText"));
-        utilizationUText->setMinimumSize(QSize(0, 30));
-        utilizationUText->setMaximumSize(QSize(16777215, 30));
-        utilizationUText->setReadOnly(true);
-
-        gridLayout->addWidget(utilizationUText, 1, 1, 1, 1);
-
         plainTextEdit_2 = new QPlainTextEdit(gridLayoutWidget);
         plainTextEdit_2->setObjectName(QStringLiteral("plainTextEdit_2"));
         plainTextEdit_2->setMinimumSize(QSize(0, 30));
@@ -200,7 +198,15 @@ public:
         schedulabilityStatusText->setMaximumSize(QSize(16777215, 30));
         schedulabilityStatusText->setReadOnly(true);
 
-        gridLayout->addWidget(schedulabilityStatusText, 2, 1, 1, 1);
+        gridLayout->addWidget(schedulabilityStatusText, 3, 1, 1, 1);
+
+        utilizationUText = new QPlainTextEdit(gridLayoutWidget);
+        utilizationUText->setObjectName(QStringLiteral("utilizationUText"));
+        utilizationUText->setMinimumSize(QSize(0, 30));
+        utilizationUText->setMaximumSize(QSize(16777215, 30));
+        utilizationUText->setReadOnly(true);
+
+        gridLayout->addWidget(utilizationUText, 1, 1, 1, 1);
 
         plainTextEdit_4 = new QPlainTextEdit(gridLayoutWidget);
         plainTextEdit_4->setObjectName(QStringLiteral("plainTextEdit_4"));
@@ -208,7 +214,7 @@ public:
         plainTextEdit_4->setMaximumSize(QSize(16777215, 30));
         plainTextEdit_4->setReadOnly(true);
 
-        gridLayout->addWidget(plainTextEdit_4, 2, 0, 1, 1);
+        gridLayout->addWidget(plainTextEdit_4, 3, 0, 1, 1);
 
         laylandCalculationText = new QPlainTextEdit(gridLayoutWidget);
         laylandCalculationText->setObjectName(QStringLiteral("laylandCalculationText"));
@@ -216,7 +222,7 @@ public:
         laylandCalculationText->setMaximumSize(QSize(16777215, 30));
         laylandCalculationText->setReadOnly(true);
 
-        gridLayout->addWidget(laylandCalculationText, 3, 0, 1, 2);
+        gridLayout->addWidget(laylandCalculationText, 4, 0, 1, 2);
 
         textEdit = new QTextEdit(gridLayoutWidget);
         textEdit->setObjectName(QStringLiteral("textEdit"));
@@ -225,15 +231,60 @@ public:
 
         gridLayout->addWidget(textEdit, 0, 0, 1, 2);
 
+        plainTextEdit_3 = new QPlainTextEdit(gridLayoutWidget);
+        plainTextEdit_3->setObjectName(QStringLiteral("plainTextEdit_3"));
+        plainTextEdit_3->setMinimumSize(QSize(0, 30));
+        plainTextEdit_3->setMaximumSize(QSize(16777215, 30));
+        plainTextEdit_3->setReadOnly(true);
+
+        gridLayout->addWidget(plainTextEdit_3, 2, 0, 1, 1);
+
+        utilizationBound = new QPlainTextEdit(gridLayoutWidget);
+        utilizationBound->setObjectName(QStringLiteral("utilizationBound"));
+        utilizationBound->setMinimumSize(QSize(0, 30));
+        utilizationBound->setMaximumSize(QSize(16777215, 30));
+        utilizationBound->setReadOnly(true);
+
+        gridLayout->addWidget(utilizationBound, 2, 1, 1, 1);
+
         tabWidget->addTab(tab_5, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QStringLiteral("tab_3"));
+        dmsTaskSetTable = new QTableWidget(tab_3);
+        if (dmsTaskSetTable->columnCount() < 5)
+            dmsTaskSetTable->setColumnCount(5);
+        QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
+        dmsTaskSetTable->setHorizontalHeaderItem(0, __qtablewidgetitem9);
+        QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
+        dmsTaskSetTable->setHorizontalHeaderItem(1, __qtablewidgetitem10);
+        QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
+        dmsTaskSetTable->setHorizontalHeaderItem(2, __qtablewidgetitem11);
+        QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
+        dmsTaskSetTable->setHorizontalHeaderItem(3, __qtablewidgetitem12);
+        QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
+        dmsTaskSetTable->setHorizontalHeaderItem(4, __qtablewidgetitem13);
+        dmsTaskSetTable->setObjectName(QStringLiteral("dmsTaskSetTable"));
+        dmsTaskSetTable->setEnabled(true);
+        dmsTaskSetTable->setGeometry(QRect(10, 10, 611, 311));
+        dmsTaskSetTable->setMaximumSize(QSize(800, 16777215));
+        dmsTaskSetTable->horizontalHeader()->setDefaultSectionSize(120);
+        dmsTaskSetTable->horizontalHeader()->setHighlightSections(true);
+        dmsTaskSetTable->horizontalHeader()->setMinimumSectionSize(39);
+        dmsTaskSetTable->horizontalHeader()->setStretchLastSection(false);
+        dmsTaskSetTable->verticalHeader()->setVisible(false);
+        dmsTaskSetTable->verticalHeader()->setDefaultSectionSize(30);
+        dmsTaskSetTable->verticalHeader()->setMinimumSectionSize(23);
+        dmsTaskSetTable->verticalHeader()->setProperty("showSortIndicator", QVariant(false));
+        dmsTaskSetTable->verticalHeader()->setStretchLastSection(false);
+        tabWidget->addTab(tab_3, QString());
         tab_6 = new QWidget();
         tab_6->setObjectName(QStringLiteral("tab_6"));
-        timelineStringText = new QTextEdit(tab_6);
-        timelineStringText->setObjectName(QStringLiteral("timelineStringText"));
-        timelineStringText->setGeometry(QRect(10, 40, 500, 30));
-        timelineStringText->setMinimumSize(QSize(500, 30));
-        timelineStringText->setMaximumSize(QSize(500, 30));
-        timelineStringText->setReadOnly(true);
+        rmsTimelineStringText = new QTextEdit(tab_6);
+        rmsTimelineStringText->setObjectName(QStringLiteral("rmsTimelineStringText"));
+        rmsTimelineStringText->setGeometry(QRect(10, 40, 500, 30));
+        rmsTimelineStringText->setMinimumSize(QSize(500, 30));
+        rmsTimelineStringText->setMaximumSize(QSize(500, 30));
+        rmsTimelineStringText->setReadOnly(true);
         TextEdit = new QTextEdit(tab_6);
         TextEdit->setObjectName(QStringLiteral("TextEdit"));
         TextEdit->setGeometry(QRect(10, 10, 256, 30));
@@ -244,40 +295,51 @@ public:
         TextEdit->setReadOnly(true);
         timelineGraphAsStringText = new QTextEdit(tab_6);
         timelineGraphAsStringText->setObjectName(QStringLiteral("timelineGraphAsStringText"));
-        timelineGraphAsStringText->setGeometry(QRect(10, 110, 1001, 341));
+        timelineGraphAsStringText->setGeometry(QRect(10, 240, 1001, 341));
         QFont font;
         font.setFamily(QStringLiteral("Courier"));
-        font.setPointSize(15);
         font.setBold(false);
         font.setItalic(false);
         font.setWeight(50);
         timelineGraphAsStringText->setFont(font);
-        timelineGraphAsStringText->setStyleSheet(QStringLiteral("font: 15pt \"Courier\";"));
+        timelineGraphAsStringText->setStyleSheet(QStringLiteral("font: 11px \"Courier\";"));
+        timelineGraphAsStringText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        timelineGraphAsStringText->setLineWrapMode(QTextEdit::NoWrap);
         timelineGraphAsStringText->setReadOnly(true);
         TextEdit_2 = new QTextEdit(tab_6);
         TextEdit_2->setObjectName(QStringLiteral("TextEdit_2"));
-        TextEdit_2->setGeometry(QRect(10, 80, 256, 30));
+        TextEdit_2->setGeometry(QRect(10, 200, 256, 30));
         TextEdit_2->setMinimumSize(QSize(0, 30));
         TextEdit_2->setMaximumSize(QSize(16777215, 30));
         TextEdit_2->setStyleSheet(QLatin1String("background-color: rgba(255, 255, 255, 0);\n"
 "border: 0px solid black;"));
         TextEdit_2->setReadOnly(true);
+        TextEdit_3 = new QTextEdit(tab_6);
+        TextEdit_3->setObjectName(QStringLiteral("TextEdit_3"));
+        TextEdit_3->setGeometry(QRect(10, 70, 256, 30));
+        TextEdit_3->setMinimumSize(QSize(0, 30));
+        TextEdit_3->setMaximumSize(QSize(16777215, 30));
+        TextEdit_3->setStyleSheet(QLatin1String("background-color: rgba(255, 255, 255, 0);\n"
+"border: 0px solid black;"));
+        TextEdit_3->setReadOnly(true);
+        dmsTimelineStringText = new QTextEdit(tab_6);
+        dmsTimelineStringText->setObjectName(QStringLiteral("dmsTimelineStringText"));
+        dmsTimelineStringText->setGeometry(QRect(10, 100, 500, 30));
+        dmsTimelineStringText->setMinimumSize(QSize(500, 30));
+        dmsTimelineStringText->setMaximumSize(QSize(500, 30));
+        dmsTimelineStringText->setReadOnly(true);
         tabWidget->addTab(tab_6, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
         MainWindow->setCentralWidget(centralWidget);
-        mainToolBar = new QToolBar(MainWindow);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
-        mainToolBar->setEnabled(false);
-        MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         MainWindow->setStatusBar(statusBar);
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(4);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -285,7 +347,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "RTS Tool", nullptr));
         actionImport_File_csv->setText(QApplication::translate("MainWindow", "Import File (.csv)", nullptr));
         actionExit->setText(QApplication::translate("MainWindow", "Exit", nullptr));
 #ifndef QT_NO_ACCESSIBILITY
@@ -299,40 +361,64 @@ public:
         ___qtablewidgetitem1->setText(QApplication::translate("MainWindow", "Period T", nullptr));
         QTableWidgetItem *___qtablewidgetitem2 = rawTaskSetTable->horizontalHeaderItem(2);
         ___qtablewidgetitem2->setText(QApplication::translate("MainWindow", "Computation Time T", nullptr));
+        QTableWidgetItem *___qtablewidgetitem3 = rawTaskSetTable->horizontalHeaderItem(3);
+        ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Deadline D", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Raw task set", nullptr));
-        QTableWidgetItem *___qtablewidgetitem3 = processedTaskSetTable->horizontalHeaderItem(0);
-        ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Process name", nullptr));
-        QTableWidgetItem *___qtablewidgetitem4 = processedTaskSetTable->horizontalHeaderItem(1);
-        ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Period T", nullptr));
-        QTableWidgetItem *___qtablewidgetitem5 = processedTaskSetTable->horizontalHeaderItem(2);
-        ___qtablewidgetitem5->setText(QApplication::translate("MainWindow", "Computation Time T", nullptr));
-        QTableWidgetItem *___qtablewidgetitem6 = processedTaskSetTable->horizontalHeaderItem(3);
-        ___qtablewidgetitem6->setText(QApplication::translate("MainWindow", "RMS Priority", nullptr));
-        QTableWidgetItem *___qtablewidgetitem7 = processedTaskSetTable->horizontalHeaderItem(4);
-        ___qtablewidgetitem7->setText(QApplication::translate("MainWindow", "Utilization U", nullptr));
+        QTableWidgetItem *___qtablewidgetitem4 = processedTaskSetTable->horizontalHeaderItem(0);
+        ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Process name", nullptr));
+        QTableWidgetItem *___qtablewidgetitem5 = processedTaskSetTable->horizontalHeaderItem(1);
+        ___qtablewidgetitem5->setText(QApplication::translate("MainWindow", "Period T", nullptr));
+        QTableWidgetItem *___qtablewidgetitem6 = processedTaskSetTable->horizontalHeaderItem(2);
+        ___qtablewidgetitem6->setText(QApplication::translate("MainWindow", "Computation Time T", nullptr));
+        QTableWidgetItem *___qtablewidgetitem7 = processedTaskSetTable->horizontalHeaderItem(3);
+        ___qtablewidgetitem7->setText(QApplication::translate("MainWindow", "RMS Priority", nullptr));
+        QTableWidgetItem *___qtablewidgetitem8 = processedTaskSetTable->horizontalHeaderItem(4);
+        ___qtablewidgetitem8->setText(QApplication::translate("MainWindow", "Utilization U", nullptr));
         plainTextEdit_2->setPlainText(QApplication::translate("MainWindow", "Utilization U:", nullptr));
         plainTextEdit_4->setPlainText(QApplication::translate("MainWindow", "Status:", nullptr));
         textEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\">Schedulability Check</span></p></body></html>", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("MainWindow", "Processed task set", nullptr));
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Schedulability Check</span></p></body></html>", nullptr));
+        plainTextEdit_3->setPlainText(QApplication::translate("MainWindow", "Utilization Bound:", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("MainWindow", "RMS task set", nullptr));
+        QTableWidgetItem *___qtablewidgetitem9 = dmsTaskSetTable->horizontalHeaderItem(0);
+        ___qtablewidgetitem9->setText(QApplication::translate("MainWindow", "Process name", nullptr));
+        QTableWidgetItem *___qtablewidgetitem10 = dmsTaskSetTable->horizontalHeaderItem(1);
+        ___qtablewidgetitem10->setText(QApplication::translate("MainWindow", "Period T", nullptr));
+        QTableWidgetItem *___qtablewidgetitem11 = dmsTaskSetTable->horizontalHeaderItem(2);
+        ___qtablewidgetitem11->setText(QApplication::translate("MainWindow", "Computation Time T", nullptr));
+        QTableWidgetItem *___qtablewidgetitem12 = dmsTaskSetTable->horizontalHeaderItem(3);
+        ___qtablewidgetitem12->setText(QApplication::translate("MainWindow", "Deadline D", nullptr));
+        QTableWidgetItem *___qtablewidgetitem13 = dmsTaskSetTable->horizontalHeaderItem(4);
+        ___qtablewidgetitem13->setText(QApplication::translate("MainWindow", "RMS Priority", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("MainWindow", "DMS task set", nullptr));
         TextEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\">Timeline string</span></p></body></html>", nullptr));
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">RMS Timeline string</span></p></body></html>", nullptr));
         timelineGraphAsStringText->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Courier'; font-size:15pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", nullptr));
+"</style></head><body style=\" font-family:'Courier'; font-size:11px; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:15pt;\"><br /></p></body></html>", nullptr));
         TextEdit_2->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\">Timeline graph</span></p></body></html>", nullptr));
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Timeline graph</span></p></body></html>", nullptr));
+        TextEdit_3->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">DMS Timeline string</span></p></body></html>", nullptr));
+        dmsTimelineStringText->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_6), QApplication::translate("MainWindow", "Timeline", nullptr));
     } // retranslateUi
 

@@ -53,6 +53,7 @@ void DataManager::ScheduleRMS()
     // Schedule a major cycle
     for(int j=0; j<minorCyclesPerMajorCycle; j++)
     {
+        //TODO: Set remainingC to Computationtime for each process
         // At the start of each minor cycle, the current t is known
         globalT = j*minorCycleLength;
         currentCycleC = 0;
@@ -64,16 +65,27 @@ void DataManager::ScheduleRMS()
             if(RMS_DataList.at(i).availableT <= globalT)
             {
                 // Check if the current task fits into the current minor cycle
-                if((currentCycleC + RMS_DataList.at(i).computationTimeC) <= minorCycleLength)
+                /*if((currentCycleC + RMS_DataList.at(i).computationTimeC) <= minorCycleLength) //TODO: check for the rest time not the computation time.
                 {//Fit
                     currentCycleC += RMS_DataList.at(i).computationTimeC;
                     RMS_DataList[i].availableT = globalT + RMS_DataList.at(i).periodT;// todo: Consider what happens if minor cycle length is exceeded here
                     globalT += RMS_DataList.at(i).computationTimeC;
                     ScheduleTask(RMS_Schedule, &RMS_DataList[i], RMS_DataList.at(i).computationTimeC, j);
                 }
+                else*/
+                if ((currentCycleC + RMS_DataList.at(i).remainingC) <=minorCycleLength){ //
+                    currentCycleC += RMS_DataList.at(i).remainingC;
+                    RMS_DataList[i].availableT = globalT + RMS_DataList.at(i).periodT; // Comment: Not sure if this way still works for RMS
+                    globalT += RMS_DataList.at(i).remainingC;
+                    ScheduleTask(RMS_Schedule, &RMS_DataList[i], RMS_DataList.at(i).remainingC, j);
+                    RMS_DataList.at(i).remainingC = RMS_DataList.at(i).computationTimeC; //restore the remaining Computation time
+                }
                 else
-                {//Doesn't fit
-
+                {//Doesn't fit TODO: substract the availible time left in the Minor cycle from the computation time of the Process
+                    int timeleft = minorCycleLength-currentCycleC;
+                    globalT += timeleft;
+                    RMS_DataList.at(i).remainingC -= timeleft;
+                    ScheduleTask(RMS_Schedule, &RMS_DataList[i],RMS_DataList.at(i).remainingC, j);
                     break;
                 }
             }
