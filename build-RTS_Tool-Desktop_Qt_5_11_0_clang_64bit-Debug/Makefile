@@ -223,6 +223,7 @@ DIST          = /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/spec_pre.prf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/qt_config.prf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/macx-clang/qmake.conf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/spec_post.prf \
+		../RTS_Tool/.qmake.stash \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/exclusive_builds.prf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/mac/sdk.prf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/toolchain.prf \
@@ -437,6 +438,7 @@ Makefile: ../RTS_Tool/RTS_Tool.pro /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/macx-
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/qt_config.prf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/macx-clang/qmake.conf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/exclusive_builds.prf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/mac/sdk.prf \
 		/Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/toolchain.prf \
@@ -632,6 +634,7 @@ Makefile: ../RTS_Tool/RTS_Tool.pro /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/macx-
 /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/qt_config.prf:
 /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/macx-clang/qmake.conf:
 /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/exclusive_builds.prf:
 /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/mac/sdk.prf:
 /Users/Kyodu/Qt/5.11.0/clang_64/mkspecs/features/toolchain.prf:
@@ -706,6 +709,7 @@ clean: compiler_clean
 
 distclean: clean 
 	-$(DEL_FILE) -r RTS_Tool.app
+	-$(DEL_FILE) .qmake.stash
 	-$(DEL_FILE) Makefile
 
 
@@ -785,7 +789,6 @@ mainwindow.o: ../RTS_Tool/mainwindow.cpp ../RTS_Tool/mainwindow.h \
 
 filemanager.o: ../RTS_Tool/filemanager.cpp ../RTS_Tool/filemanager.h \
 		/Users/Kyodu/Qt/5.11.0/clang_64/lib/QtCore.framework/Headers/qstring.h \
-		/Users/Kyodu/Qt/5.11.0/clang_64/lib/QtCore.framework/Headers/qfile \
 		/Users/Kyodu/Qt/5.11.0/clang_64/lib/QtCore.framework/Headers/qfile.h \
 		/Users/Kyodu/Qt/5.11.0/clang_64/lib/QtCore.framework/Headers/qdebug.h \
 		../RTS_Tool/datamanager.h \
