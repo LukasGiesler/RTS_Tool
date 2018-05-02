@@ -63,7 +63,7 @@ public:
     void AddRawData(QStringList processNameList, QStringList periodTList, QStringList computationTimeCList, QStringList deadlineDList);
 
     // Turns raw data to rms data
-    void ProcessRmsData();
+    QList<ProcessData> ProcessRmsData();
 
     // Turns raw data to dms data
     void ProcessDmsData();

@@ -18,23 +18,24 @@ void DataManager::AddRawData(QStringList processNameList, QStringList periodTLis
     }
 }
 
-void DataManager::ProcessRmsData()
+QList<ProcessData> DataManager::ProcessRmsData()
 {
+    QList<ProcessData> RMS_Data;
     RMS_DataList.clear();
     // Create processed data list
     for(int i=0;i<rawDataList.size();i++)
     {
         ProcessData processData(rawDataList[i].processName, rawDataList[i].periodT, rawDataList[i].computationTimeC, 0, 0);
-        RMS_DataList.append(processData);
+        RMS_Data.append(processData);
     }
 
     // Sort by period T to determine priority based on rate monotonic scheduling
-    std::sort(RMS_DataList.begin(), RMS_DataList.end(), DataManager::dataComparison);
+    std::sort(RMS_Data.begin(), RMS_Data.end(), DataManager::dataComparison);
 
     // Add priority based on sort
-    for(int i=0;i<RMS_DataList.size();i++)
+    for(int i=0;i<RMS_Data.size();i++)
     {
-        RMS_DataList[i].priority = RMS_DataList.size() - i;
+        RMS_Data[i].priority = RMS_Data.size() - i;
     }
 
     // Test schedulability
@@ -121,23 +122,23 @@ void DataManager::ScheduleDMS()
 
 }
 
-void DataManager::LuiLaylandTest()
+void DataManager::LuiLaylandTest(ProcessData RMS_Data)
 {
     // Calculate Lui-Layland Utilization U for the task set
     laylandCalculationString.clear();
     laylandCalculationString.append("U=");
     utilizationU = 0;
-    for(int i=0;i<RMS_DataList.size();i++)
+    for(int i=0;i<RMS_Data.size();i++)
     {
-        float currentUtilizationU = ((float)RMS_DataList.at(i).computationTimeC/(float)RMS_DataList.at(i).periodT);
+        float currentUtilizationU = ((float)RMS_Data.at(i).computationTimeC/(float)RMS_Data.at(i).periodT);
         utilizationU += currentUtilizationU;
-        RMS_DataList[i].utilizationU = currentUtilizationU;
+        RMS_Data[i].utilizationU = currentUtilizationU;
         if(i>0) laylandCalculationString.append(" + ");
-        laylandCalculationString.append(QString::number(RMS_DataList.at(i).computationTimeC) + "/" + QString::number(RMS_DataList.at(i).periodT));
+        laylandCalculationString.append(QString::number(RMS_Data.at(i).computationTimeC) + "/" + QString::number(RMS_Data.at(i).periodT));
     }
     laylandCalculationString.append(" = " + QString::number(utilizationU));
 
-    utilizationBound = RMS_DataList.size()*(std::pow(2.f,1.f/RMS_DataList.size())-1.f);
+    utilizationBound = RMS_Data.size()*(std::pow(2.f,1.f/RMS_Data.size())-1.f);
 }
 
 // Calculates Lowest Common Mulitple
