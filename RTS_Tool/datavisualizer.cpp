@@ -8,147 +8,126 @@ DataVisualizer::DataVisualizer()
 
 }
 
+
+DataVisualizer::DataVisualizer(DataManager* inDataManager)
+{
+    dataManager = inDataManager;
+}
+
 void DataVisualizer::VisualizeData()
 {
+    DrawRMS();
+    DrawDMS();
+}
 
-    CalculateLCM();
-    // Cleanup
-    timelineString.clear();
-
-    /* RMS Scheduling Concept
-     * 1. Lowest Common Multiple of period T of sorted task list to determine Major Cycle Length
-     * 2. Minor Cycle Length is the smallest period T
-     * 3. Each Minor Cycle Loop
-     * 3.1 Check Task with highest priority (lowest period T)
-     * 3.2 If task is currently not computing, start the task.
-     * 3.3 If it is computing, go to next task.
-     */
-
-    // todo: Create Timeline string
-    int minorCycleLength = DataManager::processedDataList.at(0).periodT;
-    int majorCycleLength = CalculateLCM();
-    int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
-    int globalT = 0;
-    int currentCycleC = 0;
-
-    // Debug Graph
-    QList<QString> timelineGraphStrings;
-    for(int i=0; i<DataManager::processedDataList.size(); i++)
+void DataVisualizer::DrawRMS()
+{
+    RMS_ScheduleString.clear();
+    timelineGraphAsString.clear();
+    // Timeline String
+    int currentMinorCycle = -1;
+    for(int i=0; i<dataManager->RMS_Schedule.size(); i++)
     {
-        timelineGraphStrings.append(DataManager::processedDataList.at(i).processName);
+        // Draw space after every minor cycle
+        if(dataManager->RMS_Schedule[i]->minorCycleIndex != currentMinorCycle)
+        {
+            RMS_ScheduleString.append(" ");
+            currentMinorCycle = dataManager->RMS_Schedule[i]->minorCycleIndex;
+        }
+
+        // Draw process name
+        RMS_ScheduleString.append(dataManager->RMS_Schedule[i]->processData->processName);
     }
 
-    // Schedule a major cycle
-    for(int j=0; j<minorCyclesPerMajorCycle; j++)
+    // Timeline Graph
+    currentMinorCycle = 0;
+    int minorCycleLength = dataManager->RMS_Schedule.at(0)->processData->periodT;
+    int majorCycleLength = dataManager->CalculateLCM();
+    int leftOverLength = 0;
+    int usedCycleLength = 0;
+
+    // Draw Y Axis
+    QList<QString> timelineRowStrings;
+    for(int i=0; i<dataManager->RMS_DataList.size(); i++)
     {
-        // At the start of each minor cycle, the current t is known
-        globalT = j*minorCycleLength;
-        // Schedule a minor cycle
-        for(int i=0; i<DataManager::processedDataList.size(); i++)
+        timelineRowStrings.append(dataManager->RMS_DataList.at(i).processName);
+    }
+
+    // Draw process status
+    for(int i=0; i<dataManager->RMS_Schedule.size(); i++)
+    {//Every process
+        // Draw end of minor cycle
+        if(dataManager->RMS_Schedule[i]->minorCycleIndex != currentMinorCycle)
         {
-            // Check if current task is available (computation finished)
-            if(DataManager::processedDataList.at(i).availableT <= globalT)
-            {
-                // Check if the current task fits into the current minor cycle
-                if((currentCycleC + DataManager::processedDataList.at(i).computationTimeC) <= minorCycleLength)
-                {//Fit
-                    ProcessedDataRow newProcessedDataRow = DataManager::processedDataList.at(i);
-                    currentCycleC += DataManager::processedDataList.at(i).computationTimeC;
-                    newProcessedDataRow.availableT = globalT + DataManager::processedDataList.at(i).periodT;// todo: Consider what happens if minor cycle length is exceeded here
-                    globalT += DataManager::processedDataList.at(i).computationTimeC;
-                    timelineString.append(newProcessedDataRow.processName);
-                    DataManager::processedDataList.removeAt(i);
-                    DataManager::processedDataList.insert(i, newProcessedDataRow);
+            qDebug() << leftOverLength;
+            for(int m=0; m<timelineRowStrings.size(); m++)
+            {// Every string row
+                for(int l=0; l<leftOverLength; l++)
+                {
+                    timelineRowStrings[m].append(".");
+                }
+                timelineRowStrings[m].append(" ");
+            }
+            usedCycleLength = 0;
+        }
 
-                    // Debug Graph
-                    for(int k=0; k<timelineGraphStrings.size(); k++)
-                    {
-                        for(int l=0; l<DataManager::processedDataList.at(i).computationTimeC; l++)
-                        {
-                            if(k == i)
-                            {
-                                timelineGraphStrings[k].append("-");
-                            }
-                            else
-                            {
-                                timelineGraphStrings[k].append(".");
-                            }
-                        }
-                    }
-
-                    qDebug() << DataManager::processedDataList.at(i).processName << " executes for " << DataManager::processedDataList.at(i).computationTimeC << " and will finish at t = " << DataManager::processedDataList.at(i).availableT;
+        for(int j=0; j<timelineRowStrings.size(); j++)
+        {// Every string row
+            for(int k=0; k<dataManager->RMS_Schedule[i]->scheduledDuration; k++)
+            {// Every string row character
+                if(dataManager->RMS_Schedule[i]->processData->processName==timelineRowStrings[j].at(0))
+                {
+                    timelineRowStrings[j].append("-");
                 }
                 else
-                {//Doesn't fit
-                    break; // this might prevent tasks with small C, but high T from being scheduled
+                {
+                    timelineRowStrings[j].append(".");
                 }
             }
+
         }
-        currentCycleC = 0;
-        timelineString.append(" ");
-        //globalT += minorCycleLength;
+        currentMinorCycle = dataManager->RMS_Schedule[i]->minorCycleIndex;
+        usedCycleLength += dataManager->RMS_Schedule[i]->scheduledDuration;
+        leftOverLength = minorCycleLength - usedCycleLength;
     }
 
-    // Debug Graph End
-    for(int i=0; i<timelineGraphStrings.size(); i++)
+    // Draw newlines on each row and combine the rows to one string
+    for(int i=0; i<timelineRowStrings.size(); i++)
     {
-        timelineGraphStrings[i].append("\n");
-        timelineGraphAsString.append(timelineGraphStrings.at(i));
+        timelineRowStrings[i].append("\n");
+        timelineGraphAsString.append(timelineRowStrings.at(i));
     }
-    for(int i=0; i<timelineGraphStrings[0].size(); i++)
+
+    // RMS Timeline Graph, draw X axis
+    for(int i=0; i<timelineRowStrings[0].size(); i++)
     {
-        if(i==0)
-        {
+        if(i > majorCycleLength) break;
+        if(i==0) {
              timelineGraphAsString.append(" ");
         }
-        else if(i%5==0)
-        {
+        else if(i%5==0) {
             timelineGraphAsString.append(QString::number(i));
+            if(i%(minorCycleLength)==0) {
+                timelineGraphAsString.append(" ");
+                continue;
+            }
         }
         else
         {
-            if(i>=10 && (i+1)%5 == 0)
+            if(i>=98 && (i+2)%5 == 0)
+            {
+                continue;
+            }
+            else if(i>=9 && (i+1)%5 == 0)
             {
                 continue;
             }
             timelineGraphAsString.append(".");
         }
     }
-
-    /* String Concept
-     * abcabdeabcabd
-     *
-     */
-
-    /* Chart Concept
-     *
-     *  ^
-     * a| -   -   -  -
-     * b|  -   -   -  -
-     * c|   -       -
-     * d|       -      -
-     * e|        -
-     * *0----5----10----15->
-     */
 }
 
-
-// Calculates Lowest Common Mulitple
-int DataVisualizer::CalculateLCM()
+void DataVisualizer::DrawDMS()
 {
-    int outLCM = DataManager::processedDataList.at(0).periodT;
-    for(int i=0; i<DataManager::processedDataList.size(); i++)
-    {
-        outLCM = (((DataManager::processedDataList.at(i).periodT * outLCM))/(CalculateGCD(DataManager::processedDataList.at(i).periodT, outLCM)));
 
-    }
-    qDebug() << QString::number(outLCM);
-    return outLCM;
-}
-
-int DataVisualizer::CalculateGCD(int a, int b)
-{
-    if (b == 0)
-        return a;
-    return CalculateGCD(b, a % b);
 }

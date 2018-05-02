@@ -8,6 +8,11 @@ FileManager::FileManager()
 
 }
 
+FileManager::FileManager(DataManager* inDataManager)
+{
+    dataManager = inDataManager;
+}
+
 // Reads a .csv file
 bool FileManager::ImportFile(QString inFile)
 {
@@ -20,21 +25,24 @@ bool FileManager::ImportFile(QString inFile)
     QStringList processNameList;
     QStringList periodTList;
     QStringList computationTimeCList;
+    QStringList deadlineDList;
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         processNameList.append(line.split(',').at(0));
         periodTList.append(line.split(',').at(1));
         computationTimeCList.append(line.split(',').at(2));
+        if(line.split(',').at(3) != nullptr)
+        {
+            deadlineDList.append(line.split(',').at(3));
+        }
+        else
+        {
+            deadlineDList.append(0);
+        }
     }
 
-    // Add imported data to the static data manager list
-    DataManager dataManager;
-    dataManager.AddRawData(processNameList, periodTList, computationTimeCList);
+    // Add imported data to the data manager list
+    dataManager->AddRawData(processNameList, periodTList, computationTimeCList, deadlineDList);
 
-
-    // Debug Output
-    qDebug() << processNameList;
-    qDebug() << periodTList;
-    qDebug() << computationTimeCList;
     return true;
 }

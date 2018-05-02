@@ -4,47 +4,53 @@
 #include "qstring.h"
 #include "qlist.h"
 
-struct RawDataRow
+struct ProcessData
 {
     QString processName;
     int periodT;
     int computationTimeC;
+    int deadlineD;
+    int priority;
+    float utilizationU;
+    int availableT;
+    float remainingC;
 
-    RawDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC)
+    ProcessData(QString inProcessName, int inPeriodT, int inComputationTimeC, int inDeadlineD, float inUtilizationU)
     {
         processName = inProcessName;
         periodT = inPeriodT;
         computationTimeC = inComputationTimeC;
+        deadlineD = inDeadlineD;
+        priority = 0;
+        utilizationU = inUtilizationU;
+        availableT = 0;
+        remainingC = computationTimeC;
+    }
+
+    ProcessData(const ProcessData& inProcessData)
+    {
+        processName = inProcessData.processName;
+        periodT = inProcessData.periodT;
+        computationTimeC = inProcessData.computationTimeC;
+        deadlineD = inProcessData.deadlineD;
+        priority = inProcessData.priority;
+        utilizationU = inProcessData.utilizationU;
+        availableT = inProcessData.utilizationU;
+        remainingC = inProcessData.remainingC;
     }
 };
 
-struct ProcessedDataRow
+struct ScheduleInfo
 {
-    QString processName;
-    int periodT;
-    int computationTimeC;
-    int rmsPriority;
-    float utilizationU;
-    float availableT;
+    ProcessData* processData;
+    int scheduledDuration;
+    int minorCycleIndex;
 
-    ProcessedDataRow(QString inProcessName, int inPeriodT, int inComputationTimeC, int inRmsPriority, float inUtilizationU)
+    ScheduleInfo(ProcessData* inProcessData, int inScheduledDuration, int inMinorCycleIndex)
     {
-        processName = inProcessName;
-        periodT = inPeriodT;
-        computationTimeC = inComputationTimeC;
-        rmsPriority = inRmsPriority;
-        utilizationU = inUtilizationU;
-        availableT = 0;
-    }
-
-    ProcessedDataRow(const ProcessedDataRow& inProcessedDataRow)
-    {
-        processName = inProcessedDataRow.processName;
-        periodT = inProcessedDataRow.periodT;
-        computationTimeC = inProcessedDataRow.computationTimeC;
-        rmsPriority = inProcessedDataRow.rmsPriority;
-        utilizationU = inProcessedDataRow.utilizationU;
-        availableT = inProcessedDataRow.availableT;
+        processData = inProcessData;
+        scheduledDuration = inScheduledDuration;
+        minorCycleIndex = inMinorCycleIndex;
     }
 };
 
@@ -54,25 +60,61 @@ public:
     DataManager();
 
     // Adds raw data to the data manager
-    void AddRawData(QStringList processNameList, QStringList periodTList, QStringList computationTimeCList);
+    void AddRawData(QStringList processNameList, QStringList periodTList, QStringList computationTimeCList, QStringList deadlineDList);
 
-    // Processes the raw data
-    void ProcessRawData();
+    // Turns raw data to rms data
+    void ProcessRmsData();
+
+    // Turns raw data to dms data
+    void ProcessDmsData();
 
     // Resets the data manager
     void Cleanup();
 
-    static QList<RawDataRow> rawDataList;
-    static QList<ProcessedDataRow> processedDataList;
+    // Executes the Lui Layland schedulability Test
+    void LuiLaylandTest();
 
+    // Schedules a task
+    void ScheduleTask(QList<ScheduleInfo*>& schedule, ProcessData* inProcessData, int inDuration, int inMinorCycleIndex);
+
+    // Creates RMS Schedule
+    void ScheduleRMS();
+
+    // Creates DMS Schedule
+    void ScheduleDMS();
+
+    // Calculates Greatest Common Divider
+    int CalculateGCD(int a, int b);
+
+    // Calculates Lowest Common Multiple
+    int CalculateLCM();
+
+    // Process Data Lists
+    QList<ProcessData> rawDataList;
+    QList<ProcessData> RMS_DataList;
+    QList<ProcessData> DMS_DataList;
+
+    // Schedule Lists
+    QList<ScheduleInfo*> RMS_Schedule;
+    QList<ScheduleInfo*> DMS_Schedule;
+
+    // Other. todo: replace them
     bool isSchedulable = false;
     float utilizationU;
+    float utilizationBound;
     QString laylandCalculationString;
 
-    static bool dataComparison(const ProcessedDataRow &s1, const ProcessedDataRow &s2)
+    // Comparision Operators
+    static bool dataComparison(const ProcessData &s1, const ProcessData &s2)
     {
         return s1.periodT < s2.periodT;
     }
+
+    static bool dmsComparison(const ProcessData &s1, const ProcessData &s2)
+    {
+        return s1.deadlineD < s2.deadlineD;
+    }
+
 };
 
 #endif // DATAMANAGER_H
