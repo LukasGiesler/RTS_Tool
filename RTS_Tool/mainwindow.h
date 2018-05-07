@@ -30,7 +30,6 @@ private:
     void SetupSchedulabilityTest();
     void SetupDataVisualization();
     void Cleanup();
-    void DrawTimelineGraph();
 
     FileManager* fileManager;
     DataManager* dataManager;

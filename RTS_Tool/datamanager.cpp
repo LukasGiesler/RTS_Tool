@@ -1,5 +1,4 @@
 #include "datamanager.h"
-#include "qstringlist.h"
 #include "qdebug.h"
 #include <cmath>
 
@@ -45,7 +44,7 @@ void DataManager::ScheduleRMS()
 {
     RMS_Schedule.clear();
     int minorCycleLength = RMS_DataList.at(0).periodT;
-    int majorCycleLength = CalculateLCM();
+    int majorCycleLength = CalculateLCM(RMS_DataList);
     int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
     int globalT = 0;
     int currentCycleC = 0;
@@ -115,7 +114,52 @@ void DataManager::ProcessDmsData()
 
 void DataManager::ScheduleDMS()
 {
+    DMS_Schedule.clear();
+    qDebug() << DMS_DataList.size();
+    int minorCycleLength = DMS_DataList.at(0).periodT;
+    int majorCycleLength = CalculateLCM(DMS_DataList);
+    int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
+    int globalT = 0;
+    int currentCycleC = 0;
 
+    // Schedule a major cycle
+    for(int j=0; j<minorCyclesPerMajorCycle; j++)
+    {
+        // At the start of each minor cycle, the current t is known
+        globalT = j*minorCycleLength;
+        currentCycleC = 0;
+
+        // Schedule a minor cycle
+        for(int i=0; i<DMS_DataList.size(); i++)
+        {
+            // Check if current task is available (computation finished, Period T Check)
+            if(DMS_DataList.at(i).availableT <= globalT)
+            {
+                int scheduleDuration = minorCycleLength - currentCycleC;
+                if(scheduleDuration <= 0)
+                {
+                    // Out of Computation Time for this minor cycle
+                    break;
+                }
+                else if(DMS_DataList.at(i).remainingC > scheduleDuration)
+                {
+                    // Task can partially be scheduled in this cycle
+                    currentCycleC += scheduleDuration;
+                    DMS_DataList[i].remainingC -= scheduleDuration;
+                }
+                else
+                {
+                    // Task can be fully scheduled in this cycle
+                    scheduleDuration = DMS_DataList.at(i).remainingC;
+                    DMS_DataList[i].availableT = globalT + DMS_DataList.at(i).periodT;
+                    currentCycleC += DMS_DataList.at(i).remainingC;
+                    globalT += DMS_DataList.at(i).remainingC;
+                    DMS_DataList[i].remainingC = DMS_DataList.at(i).computationTimeC;// Restore Computation Time to default since we completely scheduled it
+                }
+                ScheduleTask(DMS_Schedule, &DMS_DataList[i], scheduleDuration, j);
+            }
+        }
+    }
 }
 
 void DataManager::LuiLaylandTest()
@@ -138,12 +182,12 @@ void DataManager::LuiLaylandTest()
 }
 
 // Calculates Lowest Common Mulitple
-int DataManager::CalculateLCM()
+int DataManager::CalculateLCM(QList<ProcessData>& dataList)
 {
-    int outLCM = RMS_DataList.at(0).periodT;
-    for(int i=0; i<RMS_DataList.size(); i++)
+    int outLCM = dataList.at(0).periodT;
+    for(int i=0; i<dataList.size(); i++)
     {
-        outLCM = (((RMS_DataList.at(i).periodT * outLCM))/(CalculateGCD(RMS_DataList.at(i).periodT, outLCM)));
+        outLCM = (((dataList.at(i).periodT * outLCM))/(CalculateGCD(dataList.at(i).periodT, outLCM)));
 
     }
     return outLCM;

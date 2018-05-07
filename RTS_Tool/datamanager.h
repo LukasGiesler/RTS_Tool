@@ -87,7 +87,7 @@ public:
     int CalculateGCD(int a, int b);
 
     // Calculates Lowest Common Multiple
-    int CalculateLCM();
+    int CalculateLCM(QList<ProcessData>& dataList);
 
     // Process Data Lists
     QList<ProcessData> rawDataList;

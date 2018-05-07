@@ -10,14 +10,7 @@ public:
     DataVisualizer();
     DataVisualizer(DataManager* inDataManager);
 
-    void VisualizeData();
-    void DrawRMS();
-    void DrawDMS();
-
-    QString RMS_ScheduleString;
-    QString timelineGraphAsString;
-
-    QString dmsTimelineString;
+    void DrawTimeline(QList<ScheduleInfo*>& schedule, QString& timelineStringText, QString& timelineGraphText);
 
     DataManager* dataManager;
 };

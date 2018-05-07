@@ -1,12 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qfiledialog.h"
-#include "qvariant.h"
-#include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
 #include "qdebug.h"
-
-using namespace QtCharts;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -42,6 +37,7 @@ void MainWindow::on_pushButton_clicked()
 
     // Process task set
     dataManager->ProcessRmsData();
+    dataManager->ProcessDmsData();
 
     // Setup raw task set table
     SetupRawDataTable();
@@ -145,10 +141,17 @@ void MainWindow::SetupDataVisualization()
     // Visualize data
     dataManager->ScheduleRMS();
     dataManager->ScheduleDMS();
-    dataVisualizer->VisualizeData();
-    ui->rmsTimelineStringText->setPlainText(dataVisualizer->RMS_ScheduleString);
-    ui->timelineGraphAsStringText->setPlainText(dataVisualizer->timelineGraphAsString);
-    ui->dmsTimelineStringText->setPlainText(dataVisualizer->dmsTimelineString);
+
+    QString scheduleAsString;
+    QString scheduleAsGraph;
+
+    dataVisualizer->DrawTimeline(dataManager->RMS_Schedule, scheduleAsString, scheduleAsGraph);
+    ui->rmsTimelineStringText->setPlainText(scheduleAsString);
+    ui->rmsTimelineText->setPlainText(scheduleAsGraph);
+
+//    dataVisualizer->DrawTimeline(dataManager->DMS_Schedule, scheduleAsString, scheduleAsGraph);
+    ui->dmsTimelineStringText->setPlainText(scheduleAsString);
+    ui->dmsTimelineText->setPlainText(scheduleAsGraph);
 }
 
 void MainWindow::Cleanup()
@@ -157,38 +160,9 @@ void MainWindow::Cleanup()
     ui->rawTaskSetTable->setRowCount(0);
     ui->processedTaskSetTable->clear();
     ui->processedTaskSetTable->setRowCount(0);
-    ui->timelineGraphAsStringText->setPlainText("");
+    ui->rmsTimelineText->setPlainText("");
     ui->rmsTimelineStringText->setPlainText("");
     ui->dmsTimelineStringText->setPlainText("");
     ui->dmsTaskSetTable->clear();
     ui->dmsTaskSetTable->setRowCount(0);
-}
-
-void MainWindow::DrawTimelineGraph()
-{
-
-    /*
-    QLineSeries *series = new QLineSeries();
-
-    series->append(0, 6);
-    series->append(2, 4);
-    series->append(3, 8);
-    series->append(7, 4);
-    series->append(10, 5);
-    *series << QPointF(11, 1) << QPointF(13, 3) << QPointF(17, 6) << QPointF(18, 3) << QPointF(20, 2);
-
-    QChart *chart = new QChart();
-    chart->legend()->hide();
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-    chart->setTitle("Simple line chart example");
-
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-
-    QMainWindow window;
-    window.setCentralWidget(chartView);
-    window.resize(400, 300);
-    window.show();
-    */
 }

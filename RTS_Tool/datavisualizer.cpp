@@ -1,5 +1,4 @@
 #include "datavisualizer.h"
-#include "datamanager.h"
 #include "qdebug.h"
 #include <numeric>
 
@@ -14,39 +13,33 @@ DataVisualizer::DataVisualizer(DataManager* inDataManager)
     dataManager = inDataManager;
 }
 
-void DataVisualizer::VisualizeData()
+void DataVisualizer::DrawTimeline(QList<ScheduleInfo*>& schedule, QString& timelineStringText, QString& timelineGraphText)
 {
-    DrawRMS();
-    DrawDMS();
-}
-
-void DataVisualizer::DrawRMS()
-{
-    RMS_ScheduleString.clear();
-    timelineGraphAsString.clear();
+    timelineStringText.clear();
+    timelineGraphText.clear();
     // Timeline String
     int currentMinorCycle = -1;
-    for(int i=0; i<dataManager->RMS_Schedule.size(); i++)
+    for(int i=0; i<schedule.size(); i++)
     {
         // Draw space after every minor cycle
-        if(dataManager->RMS_Schedule[i]->minorCycleIndex != currentMinorCycle)
+        if(schedule[i]->minorCycleIndex != currentMinorCycle)
         {
-            RMS_ScheduleString.append(" ");
-            currentMinorCycle = dataManager->RMS_Schedule[i]->minorCycleIndex;
+            timelineStringText.append(" ");
+            currentMinorCycle = schedule[i]->minorCycleIndex;
         }
 
         // Draw process name
-        RMS_ScheduleString.append(dataManager->RMS_Schedule[i]->processData->processName);
+        timelineStringText.append(schedule[i]->processData->processName);
     }
 
     // Timeline Graph
     currentMinorCycle = 0;
-    int minorCycleLength = dataManager->RMS_Schedule.at(0)->processData->periodT;
-    int majorCycleLength = dataManager->CalculateLCM();
+    int minorCycleLength = schedule.at(0)->processData->periodT;
+    int majorCycleLength = dataManager->CalculateLCM(dataManager->RMS_DataList);
     int leftOverLength = 0;
     int usedCycleLength = 0;
 
-    // Draw Y Axis
+    // Draw Y Axis - todo: change RMS to current data list
     QList<QString> timelineRowStrings;
     for(int i=0; i<dataManager->RMS_DataList.size(); i++)
     {
@@ -54,12 +47,11 @@ void DataVisualizer::DrawRMS()
     }
 
     // Draw process status
-    for(int i=0; i<dataManager->RMS_Schedule.size(); i++)
+    for(int i=0; i<schedule.size(); i++)
     {//Every process
         // Draw end of minor cycle
-        if(dataManager->RMS_Schedule[i]->minorCycleIndex != currentMinorCycle)
+        if(schedule[i]->minorCycleIndex != currentMinorCycle)
         {
-            qDebug() << leftOverLength;
             for(int m=0; m<timelineRowStrings.size(); m++)
             {// Every string row
                 for(int l=0; l<leftOverLength; l++)
@@ -73,9 +65,9 @@ void DataVisualizer::DrawRMS()
 
         for(int j=0; j<timelineRowStrings.size(); j++)
         {// Every string row
-            for(int k=0; k<dataManager->RMS_Schedule[i]->scheduledDuration; k++)
+            for(int k=0; k<schedule[i]->scheduledDuration; k++)
             {// Every string row character
-                if(dataManager->RMS_Schedule[i]->processData->processName==timelineRowStrings[j].at(0))
+                if(schedule[i]->processData->processName==timelineRowStrings[j].at(0))
                 {
                     timelineRowStrings[j].append("-");
                 }
@@ -86,8 +78,8 @@ void DataVisualizer::DrawRMS()
             }
 
         }
-        currentMinorCycle = dataManager->RMS_Schedule[i]->minorCycleIndex;
-        usedCycleLength += dataManager->RMS_Schedule[i]->scheduledDuration;
+        currentMinorCycle = schedule[i]->minorCycleIndex;
+        usedCycleLength += schedule[i]->scheduledDuration;
         leftOverLength = minorCycleLength - usedCycleLength;
     }
 
@@ -95,20 +87,20 @@ void DataVisualizer::DrawRMS()
     for(int i=0; i<timelineRowStrings.size(); i++)
     {
         timelineRowStrings[i].append("\n");
-        timelineGraphAsString.append(timelineRowStrings.at(i));
+        timelineGraphText.append(timelineRowStrings.at(i));
     }
 
-    // RMS Timeline Graph, draw X axis
+    // Timeline Graph, draw X axis
     for(int i=0; i<timelineRowStrings[0].size(); i++)
     {
         if(i > majorCycleLength) break;
         if(i==0) {
-             timelineGraphAsString.append(" ");
+             timelineGraphText.append(" ");
         }
         else if(i%5==0) {
-            timelineGraphAsString.append(QString::number(i));
+            timelineGraphText.append(QString::number(i));
             if(i%(minorCycleLength)==0) {
-                timelineGraphAsString.append(" ");
+                timelineGraphText.append(" ");
                 continue;
             }
         }
@@ -122,12 +114,8 @@ void DataVisualizer::DrawRMS()
             {
                 continue;
             }
-            timelineGraphAsString.append(".");
+            timelineGraphText.append(".");
         }
     }
 }
 
-void DataVisualizer::DrawDMS()
-{
-
-}
