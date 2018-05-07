@@ -60,22 +60,31 @@ void DataManager::ScheduleRMS()
         // Schedule a minor cycle
         for(int i=0; i<RMS_DataList.size(); i++)
         {
-            // Check if current task is available (computation finished)
+            // Check if current task is available (computation finished, Period T Check)
             if(RMS_DataList.at(i).availableT <= globalT)
             {
-                // Check if the current task fits into the current minor cycle
-                if((currentCycleC + RMS_DataList.at(i).computationTimeC) <= minorCycleLength)
-                {//Fit
-                    currentCycleC += RMS_DataList.at(i).computationTimeC;
-                    RMS_DataList[i].availableT = globalT + RMS_DataList.at(i).periodT;// todo: Consider what happens if minor cycle length is exceeded here
-                    globalT += RMS_DataList.at(i).computationTimeC;
-                    ScheduleTask(RMS_Schedule, &RMS_DataList[i], RMS_DataList.at(i).computationTimeC, j);
-                }
-                else
-                {//Doesn't fit
-
+                int scheduleDuration = minorCycleLength - currentCycleC;
+                if(scheduleDuration <= 0)
+                {
+                    // Out of Computation Time for this minor cycle
                     break;
                 }
+                else if(RMS_DataList.at(i).remainingC > scheduleDuration)
+                {
+                    // Task can partially be scheduled in this cycle
+                    currentCycleC += scheduleDuration;
+                    RMS_DataList[i].remainingC -= scheduleDuration;
+                }
+                else
+                {
+                    // Task can be fully scheduled in this cycle
+                    scheduleDuration = RMS_DataList.at(i).remainingC;
+                    RMS_DataList[i].availableT = globalT + RMS_DataList.at(i).periodT;
+                    currentCycleC += RMS_DataList.at(i).remainingC;
+                    globalT += RMS_DataList.at(i).remainingC;
+                    RMS_DataList[i].remainingC = RMS_DataList.at(i).computationTimeC;// Restore Computation Time to default since we completely scheduled it
+                }
+                ScheduleTask(RMS_Schedule, &RMS_DataList[i], scheduleDuration, j);
             }
         }
     }
