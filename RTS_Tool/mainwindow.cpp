@@ -51,6 +51,9 @@ void MainWindow::on_pushButton_clicked()
     // Setup dms task set
     dataManager->ProcessDmsData();
     SetupDmsDataTable();
+
+    // Setup Response Time Analysis
+    SetupResponseTimeAnalysis();
 }
 
 void MainWindow::SetupRawDataTable()
@@ -120,19 +123,19 @@ void MainWindow::SetupSchedulabilityTest()
     if(dataManager->utilizationU <= dataManager->utilizationBound)
     {
         ui->schedulabilityStatusText->setPlainText("Success.");
-        ui->schedulabilityStatusText->setStyleSheet("color:green;");
+        ui->schedulabilityStatusText->setStyleSheet("color:green;border: 0px solid black;");
         SetupDataVisualization();
     }
     else if((dataManager->utilizationBound < dataManager->utilizationU) && (dataManager->utilizationU <= 1))
     {
         ui->schedulabilityStatusText->setPlainText("Inconclusive.");
-        ui->schedulabilityStatusText->setStyleSheet("color:DarkOrange;");
+        ui->schedulabilityStatusText->setStyleSheet("color:DarkOrange;border: 0px solid black;");
         SetupDataVisualization();
     }
     else
     {
         ui->schedulabilityStatusText->setPlainText("Overload.");
-        ui->schedulabilityStatusText->setStyleSheet("color:red;");
+        ui->schedulabilityStatusText->setStyleSheet("color:red;border: 0px solid black;");
     }
 }
 
@@ -149,9 +152,23 @@ void MainWindow::SetupDataVisualization()
     ui->rmsTimelineStringText->setPlainText(scheduleAsString);
     ui->rmsTimelineText->setPlainText(scheduleAsGraph);
 
-//    dataVisualizer->DrawTimeline(dataManager->DMS_Schedule, scheduleAsString, scheduleAsGraph);
+    dataVisualizer->DrawTimeline(dataManager->DMS_Schedule, scheduleAsString, scheduleAsGraph);
     ui->dmsTimelineStringText->setPlainText(scheduleAsString);
     ui->dmsTimelineText->setPlainText(scheduleAsGraph);
+}
+
+void MainWindow::SetupResponseTimeAnalysis()
+{
+    QString rtaResultString;
+    QString rtaCalculationString;
+
+    dataManager->SimplifiedResponseTimeAnalysis(dataManager->DMS_DataList, rtaResultString, rtaCalculationString);
+    ui->simplifiedRTAResultText->setPlainText(rtaResultString);
+    ui->simplifiedRTAStringText->setPlainText(rtaCalculationString);
+
+    dataManager->ExactResponseTimeAnalysis(dataManager->DMS_DataList, rtaResultString, rtaCalculationString);
+    ui->exactRTAResultText->setPlainText(rtaResultString);
+    ui->exactRTAStringText->setPlainText(rtaCalculationString);
 }
 
 void MainWindow::Cleanup()

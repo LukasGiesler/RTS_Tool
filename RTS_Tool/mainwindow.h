@@ -29,6 +29,7 @@ private:
     void SetupDmsDataTable();
     void SetupSchedulabilityTest();
     void SetupDataVisualization();
+    void SetupResponseTimeAnalysis();
     void Cleanup();
 
     FileManager* fileManager;

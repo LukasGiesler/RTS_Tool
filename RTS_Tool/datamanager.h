@@ -74,6 +74,12 @@ public:
     // Executes the Lui Layland schedulability Test
     void LuiLaylandTest();
 
+    // Executes Simplified Response Time Analysis
+    void SimplifiedResponseTimeAnalysis(QList<ProcessData> dataList, QString& rtaResultString, QString& rtaCalculationString);
+
+    // Executes Exact Response Time Analysis
+    void ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString& rtaResultString, QString& rtaCalculationString);
+
     // Schedules a task
     void ScheduleTask(QList<ScheduleInfo*>& schedule, ProcessData* inProcessData, int inDuration, int inMinorCycleIndex);
 
@@ -113,6 +119,11 @@ public:
     static bool dmsComparison(const ProcessData &s1, const ProcessData &s2)
     {
         return s1.deadlineD < s2.deadlineD;
+    }
+
+    static bool lowestPriorityFirst(const ProcessData &s1, const ProcessData &s2)
+    {
+        return s1.priority < s2.priority;
     }
 
 };

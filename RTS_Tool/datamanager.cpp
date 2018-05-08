@@ -115,7 +115,6 @@ void DataManager::ProcessDmsData()
 void DataManager::ScheduleDMS()
 {
     DMS_Schedule.clear();
-    qDebug() << DMS_DataList.size();
     int minorCycleLength = DMS_DataList.at(0).periodT;
     int majorCycleLength = CalculateLCM(DMS_DataList);
     int minorCyclesPerMajorCycle = majorCycleLength/minorCycleLength;
@@ -204,5 +203,101 @@ int DataManager::CalculateGCD(int a, int b)
 void DataManager::ScheduleTask(QList<ScheduleInfo*>& schedule, ProcessData* inProcessData, int inDuration, int inMinorCycleIndex)
 {
     schedule.append(new ScheduleInfo(inProcessData, inDuration, inMinorCycleIndex));
+}
+
+/*
+ * Ri = Ci + Sum(RoundUp(Di/Tj)*Cj)
+ * If Ri < Di, then DMS is scheduable
+ * Sum of all tasks with higher priority
+ */
+void DataManager::SimplifiedResponseTimeAnalysis(QList<ProcessData> dataList, QString& rtaResultString, QString& rtaCalculationString)
+{
+    rtaResultString.clear();
+    rtaCalculationString.clear();
+
+    double responseTimeR = 0.0;
+
+    // Swap order based on priority
+    std::sort(dataList.begin(), dataList.end(), DataManager::lowestPriorityFirst);
+
+    // Iterate over all tasks from lowest to highest priority
+    for(int i=0; i<dataList.size(); i++)
+    {
+        responseTimeR = dataList.at(i).computationTimeC;
+
+        if(i==0) rtaCalculationString.append("R" + dataList.at(i).processName + " = " + QString::number(responseTimeR) + "\n");
+
+        // Iterate over all tasks with higher priority than process i
+        for(int j=1; j<=i && j<dataList.size(); j++)
+        {
+            double DdividedByT = ceil((double)dataList.at(i).deadlineD/(double)dataList.at(j).periodT);
+            responseTimeR += DdividedByT*(double)dataList.at(j).computationTimeC;
+            rtaCalculationString.append("R" + dataList.at(i).processName +  QString::number(j) + " = " + QString::number(responseTimeR) + "\n");
+        }
+    }
+
+    // Check
+    rtaCalculationString.append("Response Time Check: " + QString::number(responseTimeR) + " <= " + QString::number(dataList.first().deadlineD));
+    if(responseTimeR <= dataList.first().deadlineD)
+    {
+        rtaResultString = "Passed.";
+    }
+    else
+    {
+        rtaResultString = "Failed.";
+    }
+
+}
+
+/*
+ * Ri = Ci + Sum(RoundUp(PreviousResponseTime/Tj)*Cj)
+ * If Ri < Di, then DMS is scheduable
+ * Sum of all tasks with higher priority
+ */
+void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString& rtaResultString, QString& rtaCalculationString)
+{
+    rtaResultString.clear();
+    rtaCalculationString.clear();
+
+    double responseTimeR = 0.0;
+    double previousResponseTime = 0.0;
+
+    // Swap order based on priority
+    //std::sort(dataList.begin(), dataList.end(), DataManager::lowestPriorityFirst);
+
+    // Iterate over all tasks from highest to lowest
+    for(int i=0; i<dataList.size(); i++)
+    {
+        responseTimeR = dataList.at(i).computationTimeC;
+
+        // First task or task with equal computation time to first
+        if(dataList.at(i).computationTimeC == dataList.at(0).computationTimeC)
+        {
+            rtaCalculationString.append("R" + dataList.at(i).processName + " = " + QString::number(responseTimeR) + "\n");
+            previousResponseTime = responseTimeR;
+            if(i==0) continue;
+        }
+
+        // Iterate over all tasks with higher priority than process i
+        for(int j=1; j<=i && j<dataList.size(); j++)
+        {
+            double DdividedByT = ceil(previousResponseTime/(double)dataList.at(j).periodT);
+            responseTimeR += DdividedByT * (double)dataList.at(j).computationTimeC;
+            rtaCalculationString.append("R" + dataList.at(i).processName +  QString::number(j) + " = " + QString::number(responseTimeR) + "\n");
+        }
+        previousResponseTime = responseTimeR;
+    }
+
+    // Check
+    rtaCalculationString.append("Response Time Check: " + QString::number(responseTimeR) + " <= " + QString::number(dataList.first().deadlineD));
+    if(responseTimeR <= dataList.first().deadlineD)
+    {
+        rtaResultString = "Passed.";
+    }
+    else
+    {
+        rtaResultString = "Failed.";
+    }
+
 }
 
