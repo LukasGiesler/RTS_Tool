@@ -6,6 +6,11 @@
 #include "datamanager.h"
 #include "datavisualizer.h"
 
+
+/*
+ * MainWindow is the entry point for the application
+ * and manages all UI related tasks
+ */
 namespace Ui {
 class MainWindow;
 }
@@ -24,6 +29,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    // UI functions
     void SetupRawDataTable();
     void SetupProcessedDataTable();
     void SetupDmsDataTable();
@@ -32,6 +38,7 @@ private:
     void SetupResponseTimeAnalysis();
     void Cleanup();
 
+    // References to all application compenents
     FileManager* fileManager;
     DataManager* dataManager;
     DataVisualizer* dataVisualizer;

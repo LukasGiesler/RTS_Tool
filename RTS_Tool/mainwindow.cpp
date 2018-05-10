@@ -3,6 +3,7 @@
 #include "qfiledialog.h"
 #include "qdebug.h"
 
+// Constructor
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -15,15 +16,21 @@ MainWindow::MainWindow(QWidget *parent) :
     dataVisualizer = new DataVisualizer(dataManager);
 }
 
+// Destructor
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+/*
+ * The Import File Button kicks off most of the Application Code
+ */
 void MainWindow::on_pushButton_clicked()
 {
+    // Make sure everything is reset
     Cleanup();
 
+    // Import the .csv file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import task set"), "", tr("Task set (*.csv)"));
 
     if(!fileManager->ImportFile(fileName))
@@ -48,14 +55,17 @@ void MainWindow::on_pushButton_clicked()
     // Setup Schedulability Test
     SetupSchedulabilityTest();
 
-    // Setup dms task set
+    // Process DMS Data
     dataManager->ProcessDmsData();
+
+    // Setup dms task set table
     SetupDmsDataTable();
 
-    // Setup Response Time Analysis
+    // Setup Response Time Analysis and Optimal Priority Assignment using RTA for the DMS Schedule
     SetupResponseTimeAnalysis();
 }
 
+// Setup the raw task set UI
 void MainWindow::SetupRawDataTable()
 {
     ui->rawTaskSetTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Process Name"), QTableWidgetItem::Type));
@@ -73,6 +83,7 @@ void MainWindow::SetupRawDataTable()
     }
 }
 
+// Setup the RMS task set UI
 void MainWindow::SetupProcessedDataTable()
 {
     ui->processedTaskSetTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Process Name"), QTableWidgetItem::Type));
@@ -94,6 +105,7 @@ void MainWindow::SetupProcessedDataTable()
     ui->tabWidget->setCurrentIndex(1);
 }
 
+// Setup the DMS Table task set UI
 void MainWindow::SetupDmsDataTable()
 {
     ui->dmsTaskSetTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Process Name"), QTableWidgetItem::Type));
@@ -113,6 +125,7 @@ void MainWindow::SetupDmsDataTable()
     }
 }
 
+// Setup the Lui-Layland Schedulability Test UI
 void MainWindow::SetupSchedulabilityTest()
 {
     ui->utilizationUText->setPlainText(QString::number(dataManager->utilizationU));
@@ -138,6 +151,7 @@ void MainWindow::SetupSchedulabilityTest()
     }
 }
 
+// Setup the Timeline Graph for RMS and DMS
 void MainWindow::SetupDataVisualization()
 {
     // Visualize data
@@ -156,6 +170,7 @@ void MainWindow::SetupDataVisualization()
     ui->dmsTimelineText->setPlainText(scheduleAsGraph);
 }
 
+// Setup Response Time Analysis and Optimal Priority Assignment using RTA for the DMS Schedule
 void MainWindow::SetupResponseTimeAnalysis()
 {
     QString rtaResultString;
@@ -171,12 +186,14 @@ void MainWindow::SetupResponseTimeAnalysis()
 
     dataManager->OptimalPriorityAssignment(dataManager->DMS_DataList);
 
+    // Update DMS task set table with new priorities. NOTE: Other UI elements will not be updated to reflect the priority changes
     for(int i=0;i<dataManager->DMS_DataList.size();i++)
     {
         ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).priority)));
     }
 }
 
+// Restore the UI to default setup
 void MainWindow::Cleanup()
 {
     ui->rawTaskSetTable->clear();
@@ -188,4 +205,12 @@ void MainWindow::Cleanup()
     ui->dmsTimelineStringText->setPlainText("");
     ui->dmsTaskSetTable->clear();
     ui->dmsTaskSetTable->setRowCount(0);
+    ui->dmsTimelineText->setPlainText("");
+    ui->laylandCalculationText->setPlainText("");
+    ui->utilizationBound->setPlainText("");
+    ui->utilizationUText->setPlainText("");
+    ui->simplifiedRTAResultText->setPlainText("");
+    ui->simplifiedRTAStringText->setPlainText("");
+    ui->exactRTAResultText->setPlainText("");
+    ui->exactRTAStringText->setPlainText("");
 }

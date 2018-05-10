@@ -2,17 +2,22 @@
 #include "qdebug.h"
 #include <numeric>
 
+// Constructor
 DataVisualizer::DataVisualizer()
 {
 
 }
-
 
 DataVisualizer::DataVisualizer(DataManager* inDataManager)
 {
     dataManager = inDataManager;
 }
 
+/*
+ *  Draws a Time Line Graph based on schedule
+ *  timelineStringText will have the format: ABC BCD ABC ...
+ *  timelineGraphText will be the actual graph as String
+ */
 void DataVisualizer::DrawTimeline(QList<ScheduleInfo*>& schedule, QString& timelineStringText, QString& timelineGraphText)
 {
     timelineStringText.clear();
@@ -35,15 +40,15 @@ void DataVisualizer::DrawTimeline(QList<ScheduleInfo*>& schedule, QString& timel
     // Timeline Graph
     currentMinorCycle = 0;
     int minorCycleLength = schedule.at(0)->processData->periodT;
-    int majorCycleLength = dataManager->CalculateLCM(dataManager->RMS_DataList);
+    int majorCycleLength = dataManager->CalculateLCM(dataManager->rawDataList);
     int leftOverLength = 0;
     int usedCycleLength = 0;
 
-    // Draw Y Axis - todo: change RMS to current data list
+    // Draw Y Axis
     QList<QString> timelineRowStrings;
-    for(int i=0; i<dataManager->RMS_DataList.size(); i++)
+    for(int i=0; i<dataManager->rawDataList.size(); i++)
     {
-        timelineRowStrings.append(dataManager->RMS_DataList.at(i).processName);
+        timelineRowStrings.append(dataManager->RMS_DataList.at(i).processName);//todo: change RMS to current data list, axis labeling for DMS  might be wrong
     }
 
     // Draw process status
@@ -86,6 +91,10 @@ void DataVisualizer::DrawTimeline(QList<ScheduleInfo*>& schedule, QString& timel
     // Draw newlines on each row and combine the rows to one string
     for(int i=0; i<timelineRowStrings.size(); i++)
     {
+        for(int l=0; l<leftOverLength; l++)
+        {
+            timelineRowStrings[i].append(".");
+        }
         timelineRowStrings[i].append("\n");
         timelineGraphText.append(timelineRowStrings.at(i));
     }
@@ -116,6 +125,7 @@ void DataVisualizer::DrawTimeline(QList<ScheduleInfo*>& schedule, QString& timel
             }
             timelineGraphText.append(".");
         }
+        qDebug() << i;
     }
 }
 

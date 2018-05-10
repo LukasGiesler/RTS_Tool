@@ -2,11 +2,13 @@
 #include "qdebug.h"
 #include <cmath>
 
+// Constructor
 DataManager::DataManager()
 {
 
 }
 
+// Creates raw Data List from Lists of task set columns
 void DataManager::AddRawData(QStringList processNameList, QStringList periodTList, QStringList computationTimeCList, QStringList deadlineDList)
 {
     rawDataList.clear();
@@ -17,6 +19,7 @@ void DataManager::AddRawData(QStringList processNameList, QStringList periodTLis
     }
 }
 
+// Process raw Data List to RMS Data List
 void DataManager::ProcessRmsData()
 {
     RMS_DataList.clear();
@@ -40,6 +43,7 @@ void DataManager::ProcessRmsData()
     LuiLaylandTest();
 }
 
+// Perform Rate Monotonic Scheduling
 void DataManager::ScheduleRMS()
 {
     RMS_Schedule.clear();
@@ -89,6 +93,7 @@ void DataManager::ScheduleRMS()
     }
 }
 
+// Process raw Data List to DMS Data List
 void DataManager::ProcessDmsData()
 {
     DMS_DataList.clear();
@@ -107,11 +112,9 @@ void DataManager::ProcessDmsData()
     {
         DMS_DataList[i].priority = DMS_DataList.size() - i;
     }
-
-    // Test schedulability
-    //LuiLaylandTest();
 }
 
+// Perform Deadline Monotonic Scheduling
 void DataManager::ScheduleDMS()
 {
     DMS_Schedule.clear();
@@ -161,6 +164,16 @@ void DataManager::ScheduleDMS()
     }
 }
 
+/*
+ * Performs Lui-Layland Schedulability Test to test if the task set is schedulable.
+ * A Utilization U of every task in the task set is computed. The utilization of all
+ * tasks is accumulated and compared to the utilization bounds. There can be three outcomes of this test
+ * Test Result < 0.69: Passed, the schedule is scheduable.
+ * Test Result > 0.69 and < 1: Inconclusive, the schedule might be scheduable.
+ * Test Result > 1: Overload, the schedule is not scheduable.
+ *
+ * For clarity a calculation String is generated for display in UI
+ */
 void DataManager::LuiLaylandTest()
 {
     // Calculate Lui-Layland Utilization U for the task set
@@ -180,35 +193,23 @@ void DataManager::LuiLaylandTest()
     utilizationBound = RMS_DataList.size()*(std::pow(2.f,1.f/RMS_DataList.size())-1.f);
 }
 
-// Calculates Lowest Common Mulitple
-int DataManager::CalculateLCM(QList<ProcessData>& dataList)
-{
-    int outLCM = dataList.at(0).periodT;
-    for(int i=0; i<dataList.size(); i++)
-    {
-        outLCM = (((dataList.at(i).periodT * outLCM))/(CalculateGCD(dataList.at(i).periodT, outLCM)));
-
-    }
-    return outLCM;
-}
-
-// Calculates Greatest Common Divider
-int DataManager::CalculateGCD(int a, int b)
-{
-    if (b == 0)
-        return a;
-    return CalculateGCD(b, a % b);
-}
-
+// Adds the task inProcessData to schedule
 void DataManager::ScheduleTask(QList<ScheduleInfo*>& schedule, ProcessData* inProcessData, int inDuration, int inMinorCycleIndex)
 {
     schedule.append(new ScheduleInfo(inProcessData, inDuration, inMinorCycleIndex));
 }
 
 /*
+ * Simplified Response Time Analysis determines the response time of each task and
+ * compares it to the deadline. This analysis has two outcomes:
+ * Response Time <= Deadline: Pass
+ * Response Time > Deadline: Failed, the task would violate its deadline
+ *
  * Ri = Ci + Sum(RoundUp(Di/Tj)*Cj)
  * If Ri < Di, then DMS is scheduable
  * Sum of all tasks with higher priority
+ *
+ * For clarity a calculation String is generated for display in UI
  */
 void DataManager::SimplifiedResponseTimeAnalysis(QList<ProcessData> dataList, QString& rtaResultString, QString& rtaCalculationString)
 {
@@ -236,7 +237,7 @@ void DataManager::SimplifiedResponseTimeAnalysis(QList<ProcessData> dataList, QS
         }
     }
 
-    // Check
+    // Check for deadline violation
     rtaCalculationString.append("Response Time Check: " + QString::number(responseTimeR) + " <= " + QString::number(dataList.first().deadlineD));
     if(responseTimeR <= dataList.first().deadlineD)
     {
@@ -250,9 +251,11 @@ void DataManager::SimplifiedResponseTimeAnalysis(QList<ProcessData> dataList, QS
 }
 
 /*
- * Ri = Ci + Sum(RoundUp(PreviousResponseTime/Tj)*Cj)
- * If Ri < Di, then DMS is scheduable
- * Sum of all tasks with higher priority
+ * See Simplified Response Time Analysis. The exact response time analysis will additionaly
+ * consider the previous response time and loop the response time calculation
+ * until the response time no longer grows.
+ *
+ * For clarity a calculation String is generated for display in UI
  */
 void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString& rtaResultString, QString& rtaCalculationString)
 {
@@ -261,12 +264,10 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
 
     double responseTimeR = 0.0;
 
-    // Swap order based on priority
-    //std::sort(dataList.begin(), dataList.end(), DataManager::lowestPriorityFirst);
-
     // Iterate over all tasks from highest to lowest
     for(int i=0; i<dataList.size(); i++)
     {
+        // Set default values for task i
         responseTimeR = dataList.at(i).computationTimeC;
         double previousResponseTime = 0.0;
 
@@ -282,9 +283,11 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
         int rIndex = 1;
         while(true)
         {
+            // Set default values for rIndex iteration
             double currentIterationResult = 0.0;
             responseTimeR = dataList.at(i).computationTimeC;
             rtaCalculationString.append("R" + dataList.at(i).processName +  QString::number(rIndex) + " = " + QString::number(dataList.at(i).computationTimeC));
+
             // Iterate over all tasks with higher priority than process i
             for(int j=1; j<=i && j<dataList.size(); j++)
             {
@@ -292,9 +295,12 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
                 {
                     rtaCalculationString.append("+ [" + QString::number(previousResponseTime) + "/" + QString::number((double)dataList.at(j-1).periodT) + "] * " + QString::number((double)dataList.at(j-1).computationTimeC));
                 }
+
                 double DdividedByT = ceil(previousResponseTime/(double)dataList.at(j-1).periodT);
                 currentIterationResult += DdividedByT * (double)dataList.at(j-1).computationTimeC;
             }
+
+            // Accumlate the response time of all rIndex loops
             responseTimeR += currentIterationResult;
             rtaCalculationString.append(" = " + QString::number(responseTimeR) + "\n");
 
@@ -309,7 +315,7 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
         }
     }
 
-    // Response Time Check
+    // Response Time Check for deadline violation
     rtaCalculationString.append("Response Time Check: " + QString::number(responseTimeR) + " < " + QString::number(dataList.last().deadlineD));
     if(responseTimeR < dataList.last().deadlineD)
     {
@@ -321,9 +327,12 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
     }
 }
 
+/*
+ * Executes exact RTA for one task.
+ * See Exact Response Time Analysis for more information.
+ */
 bool DataManager::ExactResponseTimeAnalysisOfTask(QList<ProcessData> dataList, int index)
 {
-    qDebug() << "RTA(" + dataList.at(index).processName +  "): ";
     double responseTimeR = dataList.at(index).computationTimeC;
     double previousResponseTime = responseTimeR;
 
@@ -331,22 +340,27 @@ bool DataManager::ExactResponseTimeAnalysisOfTask(QList<ProcessData> dataList, i
     int rIndex = 1;
     while(true)
     {
+        // Set default values for rIndex iteration
         double currentIterationResult = 0.0;
         responseTimeR = dataList.at(index).computationTimeC;
-        //if(index==0) break;
 
         // Iterate over all tasks
         for(int j=0; j<dataList.size(); j++)
         {
-            if(j == index) continue;
-            //qDebug() << dataList.at(j).processName;
+            if(j == index) continue; // ignore the same task, e.g. A==A
+
+            // Special Case, first task will always have result of computation time. The +1 simulates round up within the calculation.
             if(j == 0) {
                 currentIterationResult += (double)dataList.at(j).computationTimeC + 1;
                 continue;
             }
+
+            //
             double DdividedByT = ceil(previousResponseTime/(double)dataList.at(j-1).periodT);
             currentIterationResult += DdividedByT * (double)dataList.at(j-1).computationTimeC;
         }
+
+        // Accumulate Response Time of all loop iterations
         responseTimeR += currentIterationResult;
 
         // Stop Response Time Iteration if result doesn't change anymore
@@ -359,14 +373,19 @@ bool DataManager::ExactResponseTimeAnalysisOfTask(QList<ProcessData> dataList, i
         rIndex++;
     }
 
-    qDebug() << "Response Time R = " << QString::number(responseTimeR) + " < " + QString::number(dataList.at(index).deadlineD);
+    // Deadline violation check
     if(responseTimeR < dataList.at(index).deadlineD)
     {
         return true;
     }
+
     return false;
 }
 
+/*
+ * Optimal Priority Assignment using Exact Response Time Analysis.
+ * Close to copy&paste from RTS script page 38
+ */
 void DataManager::OptimalPriorityAssignment(QList<ProcessData>& dataList)
 {
     for(int k=0; k<dataList.size(); k++)
@@ -389,3 +408,22 @@ void DataManager::OptimalPriorityAssignment(QList<ProcessData>& dataList)
     }
 }
 
+// Calculates Lowest Common Mulitple of dataList
+int DataManager::CalculateLCM(QList<ProcessData>& dataList)
+{
+    int outLCM = dataList.at(0).periodT;
+    for(int i=0; i<dataList.size(); i++)
+    {
+        outLCM = (((dataList.at(i).periodT * outLCM))/(CalculateGCD(dataList.at(i).periodT, outLCM)));
+
+    }
+    return outLCM;
+}
+
+// Calculates Greatest Common Divider
+int DataManager::CalculateGCD(int a, int b)
+{
+    if (b == 0)
+        return a;
+    return CalculateGCD(b, a % b);
+}

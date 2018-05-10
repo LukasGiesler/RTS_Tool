@@ -54,6 +54,10 @@ struct ScheduleInfo
     }
 };
 
+/*
+ * The DataManager is the core of the application. It stores all scheduling data and
+ * performs several operations on that data.
+ */
 class DataManager
 {
 public:
@@ -117,7 +121,7 @@ public:
     QString laylandCalculationString;
     QString optimalPriorityAssignmentString;
 
-    // Comparision Operators
+    // Comparision Operators used for sorting
     static bool dataComparison(const ProcessData &s1, const ProcessData &s2)
     {
         return s1.periodT < s2.periodT;

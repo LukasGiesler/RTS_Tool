@@ -617,7 +617,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tab_9">
          <attribute name="title">
@@ -884,11 +884,6 @@ border: 0px solid black;</string>
            <bool>true</bool>
           </property>
          </widget>
-        </widget>
-        <widget class="QWidget" name="tab_12">
-         <attribute name="title">
-          <string>Optimal Priority Assignment</string>
-         </attribute>
         </widget>
         <widget class="QWidget" name="tab_6">
          <attribute name="title">
