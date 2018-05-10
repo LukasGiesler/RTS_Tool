@@ -260,7 +260,6 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
     rtaCalculationString.clear();
 
     double responseTimeR = 0.0;
-    double previousResponseTime = 0.0;
 
     // Swap order based on priority
     //std::sort(dataList.begin(), dataList.end(), DataManager::lowestPriorityFirst);
@@ -269,28 +268,50 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
     for(int i=0; i<dataList.size(); i++)
     {
         responseTimeR = dataList.at(i).computationTimeC;
+        double previousResponseTime = 0.0;
 
         // First task or task with equal computation time to first
         if(dataList.at(i).computationTimeC == dataList.at(0).computationTimeC)
         {
             rtaCalculationString.append("R" + dataList.at(i).processName + " = " + QString::number(responseTimeR) + "\n");
-            previousResponseTime = responseTimeR;
+            previousResponseTime = responseTimeR;// This is R0
             if(i==0) continue;
         }
 
-        // Iterate over all tasks with higher priority than process i
-        for(int j=1; j<=i && j<dataList.size(); j++)
+        // Response Time Iteration Loop
+        int rIndex = 1;
+        while(true)
         {
-            double DdividedByT = ceil(previousResponseTime/(double)dataList.at(j).periodT);
-            responseTimeR += DdividedByT * (double)dataList.at(j).computationTimeC;
-            rtaCalculationString.append("R" + dataList.at(i).processName +  QString::number(j) + " = " + QString::number(responseTimeR) + "\n");
+            double currentIterationResult = 0.0;
+            responseTimeR = dataList.at(i).computationTimeC;
+            rtaCalculationString.append("R" + dataList.at(i).processName +  QString::number(rIndex) + " = " + QString::number(dataList.at(i).computationTimeC));
+            // Iterate over all tasks with higher priority than process i
+            for(int j=1; j<=i && j<dataList.size(); j++)
+            {
+                if(previousResponseTime != 0.0)
+                {
+                    rtaCalculationString.append("+ [" + QString::number(previousResponseTime) + "/" + QString::number((double)dataList.at(j-1).periodT) + "] * " + QString::number((double)dataList.at(j-1).computationTimeC));
+                }
+                double DdividedByT = ceil(previousResponseTime/(double)dataList.at(j-1).periodT);
+                currentIterationResult += DdividedByT * (double)dataList.at(j-1).computationTimeC;
+            }
+            responseTimeR += currentIterationResult;
+            rtaCalculationString.append(" = " + QString::number(responseTimeR) + "\n");
+
+            // Stop Response Time Iteration if result doesn't change anymore
+            if(responseTimeR == previousResponseTime)
+            {
+                rIndex = 1;
+                break;
+            }
+            previousResponseTime = responseTimeR;
+            rIndex++;
         }
-        previousResponseTime = responseTimeR;
     }
 
-    // Check
-    rtaCalculationString.append("Response Time Check: " + QString::number(responseTimeR) + " <= " + QString::number(dataList.first().deadlineD));
-    if(responseTimeR <= dataList.first().deadlineD)
+    // Response Time Check
+    rtaCalculationString.append("Response Time Check: " + QString::number(responseTimeR) + " < " + QString::number(dataList.last().deadlineD));
+    if(responseTimeR < dataList.last().deadlineD)
     {
         rtaResultString = "Passed.";
     }
@@ -298,6 +319,73 @@ void DataManager::ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString
     {
         rtaResultString = "Failed.";
     }
+}
 
+bool DataManager::ExactResponseTimeAnalysisOfTask(QList<ProcessData> dataList, int index)
+{
+    qDebug() << "RTA(" + dataList.at(index).processName +  "): ";
+    double responseTimeR = dataList.at(index).computationTimeC;
+    double previousResponseTime = responseTimeR;
+
+    // Response Time Iteration Loop
+    int rIndex = 1;
+    while(true)
+    {
+        double currentIterationResult = 0.0;
+        responseTimeR = dataList.at(index).computationTimeC;
+        //if(index==0) break;
+
+        // Iterate over all tasks
+        for(int j=0; j<dataList.size(); j++)
+        {
+            if(j == index) continue;
+            //qDebug() << dataList.at(j).processName;
+            if(j == 0) {
+                currentIterationResult += (double)dataList.at(j).computationTimeC + 1;
+                continue;
+            }
+            double DdividedByT = ceil(previousResponseTime/(double)dataList.at(j-1).periodT);
+            currentIterationResult += DdividedByT * (double)dataList.at(j-1).computationTimeC;
+        }
+        responseTimeR += currentIterationResult;
+
+        // Stop Response Time Iteration if result doesn't change anymore
+        if(responseTimeR == previousResponseTime)
+        {
+            rIndex = 1;
+            break;
+        }
+        previousResponseTime = responseTimeR;
+        rIndex++;
+    }
+
+    qDebug() << "Response Time R = " << QString::number(responseTimeR) + " < " + QString::number(dataList.at(index).deadlineD);
+    if(responseTimeR < dataList.at(index).deadlineD)
+    {
+        return true;
+    }
+    return false;
+}
+
+void DataManager::OptimalPriorityAssignment(QList<ProcessData>& dataList)
+{
+    for(int k=0; k<dataList.size(); k++)
+    {
+        bool ok = false;
+        for(int next=k; next<dataList.size(); next++)
+        {
+            // Swap Priorities of k and next
+            int tmpPriority = dataList[k].priority;
+            dataList[k].priority = dataList[next].priority;
+            dataList[next].priority = tmpPriority;
+
+            ok = ExactResponseTimeAnalysisOfTask(dataList, k);
+            // RTA of k
+            if(ok)
+            {
+                break; // exit loop
+            }
+        }
+    }
 }
 

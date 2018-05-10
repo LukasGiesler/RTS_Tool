@@ -111,7 +111,6 @@ void MainWindow::SetupDmsDataTable()
         ui->dmsTaskSetTable->setItem(i, 3, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).deadlineD)));
         ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).priority)));
     }
-
 }
 
 void MainWindow::SetupSchedulabilityTest()
@@ -169,6 +168,13 @@ void MainWindow::SetupResponseTimeAnalysis()
     dataManager->ExactResponseTimeAnalysis(dataManager->DMS_DataList, rtaResultString, rtaCalculationString);
     ui->exactRTAResultText->setPlainText(rtaResultString);
     ui->exactRTAStringText->setPlainText(rtaCalculationString);
+
+    dataManager->OptimalPriorityAssignment(dataManager->DMS_DataList);
+
+    for(int i=0;i<dataManager->DMS_DataList.size();i++)
+    {
+        ui->dmsTaskSetTable->setItem(i, 4, new QTableWidgetItem(QString::number(dataManager->DMS_DataList.at(i).priority)));
+    }
 }
 
 void MainWindow::Cleanup()

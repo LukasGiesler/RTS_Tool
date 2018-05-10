@@ -80,6 +80,12 @@ public:
     // Executes Exact Response Time Analysis
     void ExactResponseTimeAnalysis(QList<ProcessData> dataList, QString& rtaResultString, QString& rtaCalculationString);
 
+    // Executes Exact Response Time Analysis of one Task
+    bool ExactResponseTimeAnalysisOfTask(QList<ProcessData> dataList, int index);
+
+    // Executes Optimal Priority Assignment
+    void OptimalPriorityAssignment(QList<ProcessData>& dataList);
+
     // Schedules a task
     void ScheduleTask(QList<ScheduleInfo*>& schedule, ProcessData* inProcessData, int inDuration, int inMinorCycleIndex);
 
@@ -109,6 +115,7 @@ public:
     float utilizationU;
     float utilizationBound;
     QString laylandCalculationString;
+    QString optimalPriorityAssignmentString;
 
     // Comparision Operators
     static bool dataComparison(const ProcessData &s1, const ProcessData &s2)
